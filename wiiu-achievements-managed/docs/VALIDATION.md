@@ -9,11 +9,12 @@ existing decoder/gate/engine/store/cloud/UI with bounded packet ownership and no
 process-memory writer. See `CEMU-INTEGRATION.md` for scope and live checklist.
 
 Local checked results: C# 5/.NET Framework x64 build succeeds; **322 core/Win32
-checks**, **143 existing UI checks**, **162 native-feed checks** and **15
+checks**, **143 existing UI checks**, **193 native-feed checks** and **15
 native-session UI checks** pass.
 Native checks include torn context/menus, invalid identity, pause/generation
 boundaries lost by queue replacement, stale/duplicate samples, exact decoder
-parity, feed-to-engine atomic persistence, panel hide/recording behavior and
+parity, feed-to-engine atomic persistence, an unread contradictory sample being
+dropped (which must reset confirmations), panel hide/recording behavior and
 timestamp-preserving reactivation. All use isolated synthetic progress.
 The default core-suite Temp attempt was denied at an atomic file move by the
 sandbox; it passed with TEMP/TMP scoped to workspace staging, as in the earlier
@@ -27,7 +28,10 @@ fork's manual Windows CI. The native CLR smoke job in
 passed: real MSVC host compilation, CLR loading, hidden UI startup, file-select
 and pause exclusion, stabilization, durable awards, stop/update rejection,
 supported-title restart without duplicates and callback unregistration. This
-is synthetic host memory, not a running Cemu game. Full emulator compilation
+is synthetic host memory, not a running Cemu game. The corrected mailbox also
+passed the actual CLR smoke test plus all 208 feed/session checks in
+[run 41239503388](https://github.com/hoffo1987/Cemu-WiiUAchievements/actions/runs/41239503388).
+Full emulator compilation
 was still in progress at this record; its final outcome is recorded separately.
 No live game was run, no experimental mapping certified, no ID/revision changed,
 and the existing Desktop Cemu installation was not replaced.

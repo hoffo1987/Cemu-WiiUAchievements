@@ -115,6 +115,12 @@ namespace WiiUAchievements
                 FramePacing.Reset(); ClearTileImages(); ClearLayers(); Arrange(); PlaceFields(); Kick();
             };
             Shown += delegate { introStart = Motion.Reduced ? -10 : (float)clock.Elapsed.TotalSeconds; Kick(); };
+            VisibleChanged += delegate
+            {
+                if (!NativeMode) return;
+                if (Visible) Kick();
+                else { animation.Stop(); FramePacing.End(); if (video != null) video.SetPlaying(false); }
+            };
             try { Icon = MakeIcon(); } catch (Exception) { }
             Disposed += delegate { Application.Idle -= OnIdle; if (scene != null) scene.Dispose(); FramePacing.End(); animation.Dispose(); banner.Dispose(); CloseBannerVideo(); ClearTileImages(); ClearLayers(); if (backdrop != null) backdrop.Dispose(); if (menuFrame != null) menuFrame.Dispose(); measure.Dispose(); measureBitmap.Dispose(); };
         }
@@ -260,7 +266,7 @@ namespace WiiUAchievements
         // ---------------------------------------------------------------- animation
         void Kick()
         {
-            if (animation.Enabled || IsDisposed) return;
+            if (animation.Enabled || IsDisposed || (NativeMode && !Visible)) return;
             lastFrame = (float)clock.Elapsed.TotalSeconds;
             FramePacing.Begin();
             animation.Start();
