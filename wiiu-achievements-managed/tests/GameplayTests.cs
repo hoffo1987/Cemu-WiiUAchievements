@@ -23,8 +23,12 @@ static class GameplayTests
   check(GameplayContext.Parse(Scene("sea"),bad).State==GameplayState.Unknown,"Disagreeing player copies cannot certify a snapshot");
   bad=(byte[])p.Clone();bad[3]=bad[11]=1;
   check(GameplayContext.Parse(Scene("sea"),bad).State==GameplayState.Unknown,"Unaligned player addresses are rejected");
-  b=Scene("sea");b[6]=255;
+  b=Scene("sea");b[1]=255;
   check(GameplayContext.Parse(b,p).State==GameplayState.Unknown,"Malformed stage names cannot become ready state");
+  // The game writes a shorter name over a longer one without clearing the rest.
+  b=Scene("sea");Encoding.ASCII.GetBytes("us").CopyTo(b,4);Encoding.ASCII.GetBytes("us").CopyTo(b,16);
+  var leftover=GameplayContext.Parse(b,p);
+  check(leftover.State==GameplayState.Ready&&leftover.Stage=="sea"&&leftover.Key==GameplayContext.Parse(Scene("sea"),p).Key,"Leftover bytes after a stage name terminator keep the world ready");
   check(GameplayContext.Parse(new byte[1],p).State==GameplayState.Unknown,"Truncated context cannot certify a loaded game");
   var gate=new GameplayGate();
   check(!gate.Accept(Sample(GameplayState.Ready,0,0)) && !gate.Accept(Sample(GameplayState.Ready,7,0)) && gate.Accept(Sample(GameplayState.Ready,8,0)),"Automatic resume requires 750ms of continuous scene stability");

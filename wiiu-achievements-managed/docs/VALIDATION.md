@@ -1,5 +1,21 @@
 # Validation record and reproduction
 
+## Stuck "Attesa automatica" after leaving a house — 2026-10-31, Windows x64, live Cemu fork
+
+Reported: after the Hero's Sword award and leaving the trainer's house on Outset,
+the fork stayed in **Attesa automatica** and never resumed. A read-only probe on
+the running Cemu (same `ProcessMemory` reader as the standalone app) showed the
+stage buffer as `sea\0us\0\0` for both current and next scene: the game wrote the
+shorter name over the previous, longer one without clearing the rest. The parser
+required zeros after the terminator, so it returned Unknown on every frame. Bytes
+after the terminator are now ignored; characters before it are still validated.
+Checked live: the same running memory now parses as Ready `sea` (47 samples, no
+context changes, no torn reads). 323 core checks (new leftover-name check; the
+malformed-name check now uses an invalid character before the terminator),
+205 feed + 16 native UI and 145 UI checks pass. The same parser is used by the
+standalone app, which had the same defect. Not checked: resuming an award flow
+in the fork with the fixed module (Cemu was running, its module was not replaced).
+
 ## Native status flicker during gameplay — 2026-10-31, Windows x64
 
 Reported in the fork: during play the status kept switching between **Cemu ·

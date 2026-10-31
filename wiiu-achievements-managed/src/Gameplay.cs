@@ -18,7 +18,8 @@ namespace WiiUAchievements
         {
             int length = 0; while (length < 8 && bytes[offset + length] != 0) length++;
             if (length == 0 || bytes.Skip(offset).Take(length).Any(b => !(b >= 65 && b <= 90 || b >= 97 && b <= 122 || b >= 48 && b <= 57 || b == 95))) return null;
-            if (bytes.Skip(offset + length).Take(8 - length).Any(b => b != 0)) return null;
+            // Bytes after the terminator are leftovers of a longer previous name (observed
+            // live: "sea\0us\0\0" after leaving a house); they are not part of the scene.
             return Encoding.ASCII.GetString(bytes, offset, length);
         }
         static uint U32(byte[] b, int i) { return ((uint)b[i] << 24) | ((uint)b[i + 1] << 16) | ((uint)b[i + 2] << 8) | b[i + 3]; }
