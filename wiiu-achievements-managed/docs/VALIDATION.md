@@ -9,7 +9,8 @@ existing decoder/gate/engine/store/cloud/UI with bounded packet ownership and no
 process-memory writer. See `CEMU-INTEGRATION.md` for scope and live checklist.
 
 Local checked results: C# 5/.NET Framework x64 build succeeds; **322 core/Win32
-checks**, **162 native-feed checks** and **15 native-session UI checks** pass.
+checks**, **143 existing UI checks**, **162 native-feed checks** and **15
+native-session UI checks** pass.
 Native checks include torn context/menus, invalid identity, pause/generation
 boundaries lost by queue replacement, stale/duplicate samples, exact decoder
 parity, feed-to-engine atomic persistence, panel hide/recording behavior and
@@ -21,7 +22,13 @@ validation record. No storage behavior was weakened.
 Patch whitespace/reverse-apply and idempotent allowlisted staging passed.
 The native host smoke test is CI-only and refuses an existing personal archive.
 This PC has no MSVC/CMake toolchain; native compilation is delegated to the
-fork's manual Windows CI. Its final outcome is recorded separately below.
+fork's manual Windows CI. The native CLR smoke job in
+[run 41239152369](https://github.com/hoffo1987/Cemu-WiiUAchievements/actions/runs/41239152369)
+passed: real MSVC host compilation, CLR loading, hidden UI startup, file-select
+and pause exclusion, stabilization, durable awards, stop/update rejection,
+supported-title restart without duplicates and callback unregistration. This
+is synthetic host memory, not a running Cemu game. Full emulator compilation
+was still in progress at this record; its final outcome is recorded separately.
 No live game was run, no experimental mapping certified, no ID/revision changed,
 and the existing Desktop Cemu installation was not replaced.
 

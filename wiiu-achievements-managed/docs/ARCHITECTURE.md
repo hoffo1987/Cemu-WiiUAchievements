@@ -2,6 +2,14 @@
 
 ## Runtime flow
 
+The optional Cemu 2.6 development fork hosts this same managed assembly in-process.
+`NativeCemuBridge` copies native submitted-frame packets into a bounded mailbox;
+`MainForm.Native.cs` consumes fresh observations on the existing UI/session thread
+and uses the same decoder, gameplay gate, engine, atomic archive and cloud client.
+It does not open a process reader or parse Cemu logs. See `CEMU-INTEGRATION.md` for
+lifecycle/reset semantics, native build requirements and outstanding live tests.
+The flow below describes the independent application's unchanged external reader.
+
 `Program.Main` enables WinForms and holds a named mutex derived from the app
 user-data directory (`--preview-toast=<png>` renders one popup frame and exits before that). `MainForm` loads `achievements.xml`, then waits for a connection request
 (or connects on `--connect`). `--demo` supplies synthetic snapshots with its own

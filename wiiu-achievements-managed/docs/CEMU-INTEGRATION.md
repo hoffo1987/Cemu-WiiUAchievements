@@ -64,10 +64,12 @@ achievement profiles. Exact-game mapping limitations remain in force.
 
 ## Build and tests
 
-From this project, before committing the staged Cemu checkout:
+From this project:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File integrations/cemu/prepare.ps1
+# To refresh an existing committed fork already staged by this script:
+powershell -NoProfile -ExecutionPolicy Bypass -File integrations/cemu/prepare.ps1 -UpdatePreparedFork
 powershell -NoProfile -ExecutionPolicy Bypass -File integrations/cemu/build.ps1 -ManagedOnly
 # Full build: VS 2022 C++ x64, Windows SDK, .NET Framework 4.8/4.8.1 SDK,
 # CMake and the pinned upstream submodules are required.
@@ -78,8 +80,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tests/run-native.ps1
 
 `prepare.ps1` requires the exact upstream base, accepts an identical already
 applied hook patch and refuses conflicting edits. A hash manifest permits
-updates only to its own previously staged files. After a fork commit, use a
-fresh base checkout to regenerate the overlay. The source/artwork allowlist
+updates only to its own previously staged files. `-UpdatePreparedFork` also
+requires its staging manifest and ancestry from the pinned base; conflicting
+local changes are still refused. The source/artwork allowlist
 excludes user directories, binaries and raw game-memory data.
 
 The manual workflow first compiles the actual native CLR host with a synthetic

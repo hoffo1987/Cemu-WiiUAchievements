@@ -70,7 +70,7 @@ public static class NativeCemuTests
 
         Check(feed.Submit(Packet(300)) && feed.Submit(Packet(400)) && feed.Submit(Packet(500)), "producer can replace bounded pending slot");
         sample = Read(feed);
-        Check(sample.MonotonicMilliseconds == 500 && !sample.Reset, "bounded queue emits only newest coherent observation"); Empty(feed);
+        Check(sample.MonotonicMilliseconds == 500 && sample.Reset, "bounded queue emits newest observation and resets across unread replacements"); Empty(feed);
         Check(feed.Submit(Packet(600, 1, NativeCemuState.Paused)) && feed.Submit(Packet(700)), "pause and resume can occur before consumption");
         Check(Read(feed).Reset, "overwritten pause remains a sticky reset boundary");
         Check(feed.Submit(Packet(800, 2)) && feed.Submit(Packet(900, 3)), "new generations supersede queued title segments");
@@ -175,6 +175,32 @@ public static class NativeCemuTests
             "native feed uses existing-save recognition without enabling planned targets");
         Check(new ProgressStore(directory, "native-test", "synthetic").Get("native-ten").Utc == origin.AddSeconds(1),
             "synthetic native award survives reopening with exact observation timestamp");
+
+        // A slow consumer must not hide contradictory progression between its
+        // confirmations, even if all native context guards remain identical.
+        store = new ProgressStore(Path.Combine(directory, "overwritten-low"), "native-test", "synthetic");
+        engine = new AchievementEngine(rules, store, AchievementRecognition.IncludeExistingSave);
+        feed = new NativeCemuFeed(); awardCount = 0;
+        Action<int, int> consume = (frame, rupees) => {
+            var bytes = Packet((ulong)(frame * 100)); bytes[87] = (byte)rupees;
+            feed.Submit(bytes); var observed = Read(feed);
+            if (observed.Reset) engine.Reset();
+            observed.Snapshot.Utc = origin.AddMilliseconds(frame * 100);
+            awardCount += engine.Update(observed.Snapshot).Count;
+        };
+        for (int frame = 0; frame <= 8; frame++) consume(frame, frame == 8 ? 15 : 0);
+        Check(engine.Status("native-ten").Confirmations == 1, "reconstructed game has one valid high confirmation before a slow-consumer gap");
+        packet = Packet(900); packet[87] = 0; feed.Submit(packet); // remains unread
+        consume(10, 15); consume(11, 15);
+        Check(!store.Contains("native-ten") && awardCount == 0,
+            "an unread low packet overwritten by high data cannot complete earlier confirmations");
+        for (int frame = 12; frame <= 20; frame++)
+        {
+            consume(frame, 15);
+            if (frame < 20) Check(!store.Contains("native-ten"), "dropped contradiction requires a new stable gameplay window and confirmations");
+        }
+        Check(awardCount == 1 && store.Get("native-ten").Utc == origin.AddSeconds(2),
+            "after dropped input only a fresh stable condition can persist an award");
         return checks;
     }
 }

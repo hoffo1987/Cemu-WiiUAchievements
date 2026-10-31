@@ -90,6 +90,10 @@ namespace WiiUAchievements
                 // timestamps match the last running packet.
                 if (!segment && state == NativeCemuState.Running && milliseconds - lastQueued < MinimumSampleMilliseconds)
                     return false;
+                // Dropped observations may contain a contradictory condition or
+                // invalid save header even when the scene/player stayed equal.
+                // Never join confirmation streaks across an unread replacement.
+                if (pending != null) resetPending = true;
                 pending = (byte[])packet.Clone(); pendingUtc = DateTime.UtcNow; lastQueued = milliseconds;
                 boundaryPending = false;
                 if (state != NativeCemuState.Running) resetPending = true;
