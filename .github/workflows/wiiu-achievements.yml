@@ -49,11 +49,41 @@ jobs:
         with:
           cmake-version: '3.29.0'
 
-      - name: Cache compiled Cemu dependencies
-        uses: actions/cache@v4
+      - name: Restore compiled Cemu dependencies
+        id: vcpkg-cache
+        uses: actions/cache/restore@v4
         with:
           path: .vcpkg-binary-cache
-          key: cemu-v26-windows-x64-static-${{ hashFiles('vcpkg.json', 'dependencies/vcpkg_overlay_ports/**') }}
+          key: cemu-v26-windows-x64-static-${{ hashFiles('vcpkg.json', 'dependencies/vcpkg_overlay_ports/**') }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            cemu-v26-windows-x64-static-${{ hashFiles('vcpkg.json', 'dependencies/vcpkg_overlay_ports/**') }}-
+
+      - name: Use runner pkg-config instead of the retired MSYS2 archive
+        shell: pwsh
+        run: |
+          # The pinned vcpkg helper explicitly supports ENV{PKG_CONFIG}; this
+          # changes one host tool, not Cemu's libraries or dependency baseline.
+          $candidates = @(
+            'C:\msys64\mingw64\bin\pkg-config.exe',
+            'C:\msys64\mingw64\bin\pkgconf.exe',
+            'C:\msys64\ucrt64\bin\pkg-config.exe',
+            'C:\msys64\ucrt64\bin\pkgconf.exe',
+            'C:\Strawberry\c\bin\pkg-config.exe'
+          )
+          $pkgConfig = $candidates | Where-Object { Test-Path -LiteralPath $_ -PathType Leaf } | Select-Object -First 1
+          if (-not $pkgConfig) {
+            $pacman = 'C:\msys64\usr\bin\pacman.exe'
+            if (-not (Test-Path -LiteralPath $pacman)) { throw 'Runner MSYS2/pkg-config not found.' }
+            & $pacman -Sy --needed --noconfirm mingw-w64-x86_64-pkgconf
+            if ($LASTEXITCODE -ne 0) { throw 'Installation of the pkg-config host tool failed.' }
+            $pkgConfig = 'C:\msys64\mingw64\bin\pkg-config.exe'
+          }
+          $version = (& $pkgConfig --version | Out-String).Trim()
+          if ($LASTEXITCODE -ne 0 -or -not $version) { throw 'Runner pkg-config is not executable.' }
+          Write-Output "Host pkg-config: $pkgConfig ($version)"
+          "PKG_CONFIG=$pkgConfig" | Out-File -LiteralPath $env:GITHUB_ENV -Encoding utf8 -Append
+          $kept = @($env:VCPKG_KEEP_ENV_VARS -split ';' | Where-Object { $_ }) + @('PKG_CONFIG')
+          ('VCPKG_KEEP_ENV_VARS=' + (($kept | Select-Object -Unique) -join ';')) | Out-File -LiteralPath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Bootstrap vcpkg
         shell: pwsh
@@ -96,3 +126,10 @@ jobs:
           path: artifacts/
           if-no-files-found: error
           retention-days: 14
+
+      - name: Save completed dependency packages even after a later build failure
+        if: ${{ always() && steps.vcpkg-cache.outcome == 'success' && steps.vcpkg-cache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v4
+        with:
+          path: .vcpkg-binary-cache
+          key: ${{ steps.vcpkg-cache.outputs.cache-primary-key }}
