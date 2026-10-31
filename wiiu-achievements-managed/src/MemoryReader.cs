@@ -114,7 +114,9 @@ namespace WiiUAchievements
         }
         public void Validate()
         {
-            if (Rupees < 0 || Rupees > 5000 || MaxHealth < 12 || MaxHealth > 80 || MaxHealth % 4 != 0 || Health < 0 || Health > MaxHealth)
+            // Health is in quarter hearts and each Piece of Heart adds one quarter to the
+            // capacity, so it need not be a whole number of hearts (observed live: 13).
+            if (Rupees < 0 || Rupees > 5000 || MaxHealth < 12 || MaxHealth > 80 || Health < 0 || Health > MaxHealth)
                 throw new ArgumentException("Valori di gioco non validi.");
         }
     }

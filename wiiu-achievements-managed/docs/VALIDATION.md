@@ -1,5 +1,21 @@
 # Validation record and reproduction
 
+## Stuck "Attesa automatica" after a Piece of Heart — 2026-11-01, Windows x64, live Cemu fork
+
+Reported in the Forsaken Fortress: recording went back to **Attesa automatica**
+and never resumed. Read-only probes on the running Cemu: the context was healthy
+(Ready `majroom`, no changes or torn reads), but the save header read
+`00 0D | 00 0C | 00 CF`, i.e. capacity 13 quarters, health 12, 207 rupees. The
+basic validator required a capacity that is a multiple of 4; each Piece of Heart
+adds one quarter, so every sample was rejected as invalid and the reader reported
+Unknown. The rule is removed; 12–80 quarters, health ≤ capacity and rupees ≤ 5000
+remain. Checked live: the production reader and engine, fed from the same running
+memory into a throwaway store, left the gameplay gate after ~0.75 s and resumed
+(existing-save recognition in that throwaway store only; the user's archive was
+not touched). 325 core checks (13-quarter sample accepted, 84 rejected), 205 feed
++ 16 native UI and 145 UI checks pass. Rule thresholds for heart achievements stay
+whole hearts. Not checked: the fork with the replaced module (Cemu was running).
+
 ## Stuck "Attesa automatica" after leaving a house — 2026-10-31, Windows x64, live Cemu fork
 
 Reported: after the Hero's Sword award and leaving the trainer's house on Outset,

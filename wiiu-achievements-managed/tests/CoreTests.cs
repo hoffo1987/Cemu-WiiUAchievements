@@ -78,6 +78,11 @@ class CoreTests
             bool rejected = false;
             try { GameSnapshot.Parse(new byte[] { 0, 12, 0, 13, 0, 0 }); } catch (ArgumentException) { rejected = true; }
             Check(rejected, "Reject impossible health");
+            var piece = GameSnapshot.Parse(new byte[] { 0, 13, 0, 12, 0, 207 });
+            Check(piece.MaxHealth == 13 && piece.Health == 12 && piece.Rupees == 207, "A Piece of Heart capacity (3 hearts + 1 quarter) is a valid sample");
+            rejected = false;
+            try { GameSnapshot.Parse(new byte[] { 0, 84, 0, 12, 0, 0 }); } catch (ArgumentException) { rejected = true; }
+            Check(rejected, "Reject a capacity above 20 hearts");
             var store = Store("baseline"); var engine = Engine(store);
             for (int i = 0; i < 5; i++) engine.Update(S(10, i));
             Check(!store.Contains("ten"), "Existing save does not award on connect");
