@@ -53,6 +53,8 @@ games, keys, save files, logs or the achievement archive in the source repositor
   and cloud client are reused. The 750 ms gate and three confirmations remain.
   Existing-save recognition retains its production behavior.
 
+Session sampling stays in `MainForm.cs`; `MainForm.Native.cs` owns the hosted
+STA/window lifecycle, and presentation stays in `MainForm.Ui.cs`.
 The native constructor uses its assembly directory for rules/resources, since
 the default CLR AppDomain base directory belongs to Cemu. Standalone startup
 retains its original directory and read-only external process reader.

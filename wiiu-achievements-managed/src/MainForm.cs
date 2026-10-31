@@ -154,6 +154,69 @@ namespace WiiUAchievements
             player.ReadOnly = value; cemuPath.ReadOnly = value;
             PlaceFields(); Invalidate(); Kick();
         }
+        // The in-process adapter keeps sampling beside the external-reader session.
+        readonly NativeCemuFeed nativeFeed;
+        bool nativeListening, nativeShutdown;
+        bool NativeMode { get { return nativeFeed != null; } }
+
+        void ConnectNative()
+        {
+            if (nativeListening) return;
+            try
+            {
+                if (String.IsNullOrWhiteSpace(player.Text)) throw new InvalidOperationException("Inserisci un nome per il profilo locale.");
+                activeProfile = selectedGame.Profiles[0];
+                session = new GameSession { TitleId = activeProfile.TitleId, Version = activeProfile.TitleVersion,
+                    RpxHash = activeProfile.RpxHash, CemuVersion = activeProfile.CemuVersion, Pid = Process.GetCurrentProcess().Id };
+                progress = OpenProgress(session.Fingerprint);
+                engine = new AchievementEngine(rules, progress, AchievementRecognition.IncludeExistingSave);
+                nativeListening = true; recording = true; paused = false; current = null;
+                SaveSettings(); SetConnected(true); RefreshList(); timer.Start();
+                hint = "Gli obiettivi seguono la partita in Cemu. Chiudere questa finestra lascia attiva la registrazione.";
+                SetAutomaticWaiting("Avvia The Wind Waker HD EUR v0 in Cemu; menu, caricamenti e pause sospendono il rilevamento.");
+            }
+            catch (Exception ex)
+            {
+                nativeListening = false; recording = false; engine = null;
+                SetConnected(false); SetStatus("Obiettivi non attivi", ex.Message, StatusKind.Error); Log(ex.Message);
+            }
+        }
+
+        void TickNative()
+        {
+            if (!nativeListening || !recording || engine == null) return;
+            try
+            {
+                NativeCemuSample sample;
+                if (!nativeFeed.TryRead(out sample))
+                {
+                    if (!nativeFeed.IsFresh)
+                    {
+                        engine.Reset(); SetAutomaticWaiting("In attesa di nuovi fotogrammi della partita in Cemu.");
+                    }
+                    return; // Never count the same frozen frame twice.
+                }
+                if (sample.Reset) engine.Reset();
+                if (sample.State != NativeCemuState.Running || sample.Snapshot == null)
+                {
+                    engine.Reset();
+                    SetAutomaticWaiting(sample.State == NativeCemuState.Paused ? "Emulazione in pausa." : "Nessuna partita supportata attiva in Cemu.");
+                    return;
+                }
+                ProcessSample(sample.Snapshot);
+            }
+            catch (Exception ex)
+            {
+                Disconnect("Registrazione sospesa: " + ex.Message);
+                SetStatus("Obiettivi non attivi", ex.Message, StatusKind.Error);
+            }
+        }
+
+        internal void ShutdownNative()
+        {
+            nativeShutdown = true; Close(); Dispose();
+        }
+
         const string DefaultHint = "Caricamenti e selezione file: attesa e ripresa automatiche. Puoi lasciare l'app collegata.";
         bool FieldsEditable { get { return memory == null && !nativeListening && !demo && !connecting && !autoReconnect; } }
         bool CanConnect { get { return !connecting && memory == null && !nativeListening && !demo && !autoReconnect; } }

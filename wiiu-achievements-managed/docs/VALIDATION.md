@@ -31,8 +31,14 @@ supported-title restart without duplicates and callback unregistration. This
 is synthetic host memory, not a running Cemu game. The corrected mailbox also
 passed the actual CLR smoke test plus all 208 feed/session checks in
 [run 41239503388](https://github.com/hoffo1987/Cemu-WiiUAchievements/actions/runs/41239503388).
-Full emulator compilation
-was still in progress at this record; its final outcome is recorded separately.
+The first full-emulator build stopped before Cemu configuration because the
+pinned vcpkg helper requested an MSYS2 pkgconf archive that all mirrors return
+as 404. The workflow now selects an available native Windows pkg-config and
+preserves it through vcpkg's documented environment override; Cemu, the library
+baseline and ports are unchanged. Partial successful dependency packages are
+cached even on build failure. Full build
+[41240085236](https://github.com/hoffo1987/Cemu-WiiUAchievements/actions/runs/41240085236)
+was in progress at this record; its final outcome is recorded separately.
 No live game was run, no experimental mapping certified, no ID/revision changed,
 and the existing Desktop Cemu installation was not replaced.
 
