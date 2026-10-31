@@ -38,9 +38,29 @@ preserves it through vcpkg's documented environment override; Cemu, the library
 baseline and ports are unchanged. Partial successful dependency packages are
 cached even on build failure. Full build
 [41240085236](https://github.com/hoffo1987/Cemu-WiiUAchievements/actions/runs/41240085236)
-was in progress at this record; its final outcome is recorded separately.
-No live game was run, no experimental mapping certified, no ID/revision changed,
-and the existing Desktop Cemu installation was not replaced.
+**succeeded**, including all upstream dependencies, the actual Cemu core/GUI,
+CLR host and final Windows x64 executable. The native job took 22 minutes.
+The development artifact was downloaded to `build-check/cemu-integrated/`;
+its managed module was rebuilt from the current local source. Cemu-native
+sources are identical to the successful CI commit `4737bd4`; subsequent source
+changes only reorganize the managed session code and update documentation.
+
+Real Windows PC smoke checks passed with that build: startup as Cemu 2.6;
+Tools/Strumenti -> Wii U Achievements opens the existing catalog **inside the
+same Cemu process**; closing/reopening the panel leaves Cemu running; the existing
+recorded awards remain displayed. The configured Wind Waker HD launched through
+the normal game list. Its log identified EUR v0 and both base/updated RPX
+`cdc68acd`. The title screen/idle intro rendered in Vulkan; the native panel
+received real observations and displayed automatic menu waiting without new
+awards. Cemu then exited normally (exit code zero), and a complete new process
+reopened the catalog with the existing recorded awards still present. The fork
+is left open at the catalog/panel for the owner. An initial sandboxed launch
+did not remain available; the actual UI check used an authorized desktop launch.
+
+Not checked in this native fork: loading a save into playable gameplay, a new
+in-world award, gameplay pause/load/death/slot transitions, sustained performance,
+or popup visibility above a real fullscreen game. No experimental mapping is
+certified, no ID/revision changed, and the Desktop Cemu executable was not replaced.
 
 ## Fixed window and performance pass — 2026-10-31, Windows x64
 

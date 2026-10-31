@@ -11,6 +11,10 @@ No new memory mapping has been declared verified.
 
 ## Running the development build
 
+The Windows build and initial PC smoke checks have passed; see `VALIDATION.md`.
+The current local executable is `build-check/cemu-integrated/Cemu.exe`.
+Playable save/load/award and fullscreen-popup validation remain pending.
+
 After successful CI, use the Windows artifact from the fork's **Cemu with Wii U
 Achievements** manual workflow. Extract into its own directory. Keep
 `WiiUAchievements/` beside the fork's `Cemu.exe`; it contains the managed module
