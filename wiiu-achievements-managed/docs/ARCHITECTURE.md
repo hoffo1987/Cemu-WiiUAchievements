@@ -3,7 +3,7 @@
 ## Runtime flow
 
 The optional Cemu 2.6 development fork hosts this same managed assembly in-process.
-`NativeCemuBridge` copies native submitted-frame packets into a bounded mailbox;
+`NativeCemuBridge` copies native submitted-frame packets into a bounded FIFO queue;
 `MainForm.cs` consumes fresh observations on the existing UI/session thread
 and uses the same decoder, gameplay gate, engine, atomic archive and cloud client.
 It does not open a process reader or parse Cemu logs. See `CEMU-INTEGRATION.md` for

@@ -68,13 +68,17 @@ public static class NativeCemuTests
         Check(feed.Submit(Packet(200)), "100ms cadence accepted");
         Check(!Read(feed).Reset, "ordinary coherent observations preserve continuity");
 
-        Check(feed.Submit(Packet(300)) && feed.Submit(Packet(400)) && feed.Submit(Packet(500)), "producer can replace bounded pending slot");
-        sample = Read(feed);
-        Check(sample.MonotonicMilliseconds == 500 && sample.Reset, "bounded queue emits newest observation and resets across unread replacements"); Empty(feed);
+        Check(feed.Submit(Packet(300)) && feed.Submit(Packet(400)) && feed.Submit(Packet(500)), "producer can run ahead of the consumer");
+        sample = Read(feed); var second = Read(feed); var third = Read(feed);
+        Check(sample.MonotonicMilliseconds == 300 && second.MonotonicMilliseconds == 400 && third.MonotonicMilliseconds == 500,
+            "unread observations are delivered in capture order");
+        Check(!sample.Reset && !second.Reset && !third.Reset, "a slower consumer no longer resets coherent gameplay"); Empty(feed);
         Check(feed.Submit(Packet(600, 1, NativeCemuState.Paused)) && feed.Submit(Packet(700)), "pause and resume can occur before consumption");
-        Check(Read(feed).Reset, "overwritten pause remains a sticky reset boundary");
-        Check(feed.Submit(Packet(800, 2)) && feed.Submit(Packet(900, 3)), "new generations supersede queued title segments");
-        sample = Read(feed); Check(sample.Reset && sample.Generation == 3, "overwritten generation cannot inherit confirmations");
+        sample = Read(feed); second = Read(feed);
+        Check(sample.State == NativeCemuState.Paused && sample.Reset && second.Reset, "a queued pause and its resume both remain reset boundaries");
+        Check(feed.Submit(Packet(800, 2)) && feed.Submit(Packet(900, 3)), "new generations can queue before consumption");
+        sample = Read(feed); second = Read(feed);
+        Check(sample.Reset && sample.Generation == 2 && second.Reset && second.Generation == 3, "each queued generation starts without inherited confirmations");
         Check(!feed.Submit(Packet(899, 3)), "native time reversal fails closed");
         Check(Read(feed).State == NativeCemuState.Stopped && !feed.IsFresh, "time reversal publishes reset instead of stale gameplay");
         Check(feed.Submit(Packet(1000, 3)) && Read(feed).Reset, "fresh segment can recover after reversal");
@@ -148,8 +152,15 @@ public static class NativeCemuTests
 
         feed = new NativeCemuFeed(); feed.Submit(Packet(100)); Read(feed);
         packet = Packet(200); Scene(packet, 40, "Name"); Buffer.BlockCopy(packet, 40, packet, 1910, 42);
-        feed.Submit(packet); feed.Submit(Packet(300)); Check(Read(feed).Reset, "overwritten file-select context clears engine continuity");
-        feed.Submit(Packet(1500)); Check(Read(feed).Reset, "native sampling gaps greater than one second reset continuity");
+        feed.Submit(packet); feed.Submit(Packet(300));
+        Check(Read(feed).Reset && Read(feed).Reset, "a queued file-select context clears engine continuity on both sides");
+        // A stalled UI loses only what exceeds the queue, and the gap becomes a boundary.
+        for (int i = 0; i <= NativeCemuFeed.QueueCapacity; i++) feed.Submit(Packet((ulong)(400 + i * 100)));
+        sample = Read(feed);
+        Check(sample.MonotonicMilliseconds == 500 && sample.Reset, "queue overflow drops the oldest observation and marks the gap");
+        for (int i = 1; i < NativeCemuFeed.QueueCapacity; i++) Check(!Read(feed).Reset, "observations after an overflow gap keep continuity");
+        Empty(feed);
+        feed.Submit(Packet(3100)); Check(Read(feed).Reset, "native sampling gaps greater than one second reset continuity");
         feed.Reset(); Check(Read(feed).Reset && !feed.IsFresh, "explicit shutdown reset invalidates the feed"); Empty(feed);
 
         // Full feed -> production engine -> disk path with synthetic timestamps.
@@ -181,26 +192,28 @@ public static class NativeCemuTests
         store = new ProgressStore(Path.Combine(directory, "overwritten-low"), "native-test", "synthetic");
         engine = new AchievementEngine(rules, store, AchievementRecognition.IncludeExistingSave);
         feed = new NativeCemuFeed(); awardCount = 0;
+        // Like MainForm.TickNative, each consume drains every queued observation in order.
         Action<int, int> consume = (frame, rupees) => {
             var bytes = Packet((ulong)(frame * 100)); bytes[87] = (byte)rupees;
-            feed.Submit(bytes); var observed = Read(feed);
-            if (observed.Reset) engine.Reset();
-            observed.Snapshot.Utc = origin.AddMilliseconds(frame * 100);
-            awardCount += engine.Update(observed.Snapshot).Count;
+            feed.Submit(bytes); NativeCemuSample observed;
+            while (feed.TryRead(out observed))
+            {
+                if (observed.Reset) engine.Reset();
+                observed.Snapshot.Utc = origin.AddMilliseconds(observed.MonotonicMilliseconds);
+                awardCount += engine.Update(observed.Snapshot).Count;
+            }
         };
         for (int frame = 0; frame <= 8; frame++) consume(frame, frame == 8 ? 15 : 0);
         Check(engine.Status("native-ten").Confirmations == 1, "reconstructed game has one valid high confirmation before a slow-consumer gap");
-        packet = Packet(900); packet[87] = 0; feed.Submit(packet); // remains unread
-        consume(10, 15); consume(11, 15);
-        Check(!store.Contains("native-ten") && awardCount == 0,
-            "an unread low packet overwritten by high data cannot complete earlier confirmations");
-        for (int frame = 12; frame <= 20; frame++)
-        {
-            consume(frame, 15);
-            if (frame < 20) Check(!store.Contains("native-ten"), "dropped contradiction requires a new stable gameplay window and confirmations");
-        }
-        Check(awardCount == 1 && store.Get("native-ten").Utc == origin.AddSeconds(2),
-            "after dropped input only a fresh stable condition can persist an award");
+        packet = Packet(900); packet[87] = 0; feed.Submit(packet); // still unread when the next frame arrives
+        consume(10, 15);
+        Check(engine.Status("native-ten").Confirmations == 1 && !store.Contains("native-ten") && awardCount == 0,
+            "an unread low packet is still evaluated and breaks the earlier confirmations");
+        consume(11, 15);
+        Check(!store.Contains("native-ten"), "after the contradiction the condition needs three new confirmations");
+        consume(12, 15);
+        Check(awardCount == 1 && store.Get("native-ten").Utc == origin.AddMilliseconds(1200),
+            "three consecutive observations after the contradiction persist the award at the observed time");
         return checks;
     }
 }

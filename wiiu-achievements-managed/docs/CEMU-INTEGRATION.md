@@ -47,9 +47,11 @@ games, keys, save files, logs or the achievement archive in the source repositor
 - Only guest stage/player/save ranges are read. The 26-byte stage and 16-byte
   player contexts guard both sides of the `0x724` save-window copy. Other PPC
   cores can still run: this is a guarded observation, not an atomic CPU stop.
-- The callback copies a 1,952-byte versioned packet into a bounded mailbox.
-  No disk, cloud, engine evaluation or window work runs on emulation threads.
-  Lifecycle/context resets survive replacement of pending packets.
+- The callback copies a 1,952-byte versioned packet into a bounded FIFO queue
+  (16 packets, 1.6 s of UI stall). No disk, cloud, engine evaluation or window
+  work runs on emulation threads. Each tick drains the queue in capture order;
+  lifecycle/context resets stay attached to their packet, and only an overflow
+  drops observations, marking the gap as a reset.
 - The WinForms session consumes observations once. Duplicates, invalid
   fingerprints, time reversals, stale observations and pauses cannot advance
   confirmations. A gap over one second clears continuity.

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
@@ -24,15 +25,20 @@ namespace WiiUAchievements
         public const ulong SupportedTitleId = 0x0005000010143600UL;
         public const uint SupportedRpxHash = 0xCDC68ACD;
         public const int FreshnessMilliseconds = 1000, MinimumSampleMilliseconds = 100;
+        // Producer and consumer both run near 100 ms, so a one-slot mailbox regularly
+        // overwrote unread observations and every overwrite reset the gameplay gate.
+        // 16 entries cover 1.6 s of UI stall; only an overflow drops observations.
+        public const int QueueCapacity = 16;
+        sealed class Queued { public byte[] Packet; public DateTime Utc; public bool Reset; }
         readonly object sync = new object();
         readonly Func<long> clock;
         readonly long frequency;
-        byte[] pending, previousContext;
+        readonly Queue<Queued> queue = new Queue<Queued>();
+        byte[] previousContext;
         bool haveHeader, haveReceipt, resetPending = true, boundaryPending, staleSent;
         NativeCemuState lastState;
         ulong lastGeneration, lastNative, lastQueued;
         long lastReceipt;
-        DateTime pendingUtc;
 
         public NativeCemuFeed() : this(Stopwatch.GetTimestamp, Stopwatch.Frequency) { }
         // Injectable monotonic clock keeps freshness regressions deterministic.
@@ -92,18 +98,18 @@ namespace WiiUAchievements
                     return false;
                 // Dropped observations may contain a contradictory condition or
                 // invalid save header even when the scene/player stayed equal.
-                // Never join confirmation streaks across an unread replacement.
-                if (pending != null) resetPending = true;
-                pending = (byte[])packet.Clone(); pendingUtc = DateTime.UtcNow; lastQueued = milliseconds;
-                boundaryPending = false;
-                if (state != NativeCemuState.Running) resetPending = true;
+                // Never join confirmation streaks across an overflow gap.
+                if (queue.Count >= QueueCapacity) { queue.Dequeue(); queue.Peek().Reset = true; }
+                queue.Enqueue(new Queued { Packet = (byte[])packet.Clone(), Utc = DateTime.UtcNow,
+                    Reset = resetPending || state != NativeCemuState.Running });
+                resetPending = boundaryPending = false; lastQueued = milliseconds;
                 return true;
             }
         }
 
         void Invalidate()
         {
-            pending = previousContext = null; haveHeader = haveReceipt = false;
+            queue.Clear(); previousContext = null; haveHeader = haveReceipt = false;
             lastState = NativeCemuState.Stopped; resetPending = boundaryPending = true; staleSent = false;
         }
         public void Reset() { lock (sync) Invalidate(); }
@@ -120,17 +126,16 @@ namespace WiiUAchievements
                 if (boundaryPending) { boundaryPending = false; sample = Boundary(); return true; }
                 if (lastState == NativeCemuState.Running && haveReceipt && !Fresh(clock()))
                 {
-                    pending = null; resetPending = true;
+                    queue.Clear(); resetPending = true;
                     if (staleSent) return false;
                     staleSent = true; sample = Boundary(); return true;
                 }
-                if (pending == null) return false;
-                byte[] packet = pending; pending = null;
+                if (queue.Count == 0) return false;
+                var entry = queue.Dequeue(); byte[] packet = entry.Packet;
                 sample = new NativeCemuSample { State = (NativeCemuState)U32(packet, 4),
-                    Generation = U64(packet, 8), MonotonicMilliseconds = U64(packet, 16), Reset = resetPending };
-                resetPending = false;
+                    Generation = U64(packet, 8), MonotonicMilliseconds = U64(packet, 16), Reset = entry.Reset };
                 if (sample.State != NativeCemuState.Running) return true;
-                DateTime utc = pendingUtc;
+                DateTime utc = entry.Utc;
                 if (!Equal(packet, 40, packet, 1910, 42))
                 {
                     sample.Reset = true;

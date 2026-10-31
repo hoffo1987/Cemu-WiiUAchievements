@@ -1,5 +1,22 @@
 # Validation record and reproduction
 
+## Native status flicker during gameplay — 2026-10-31, Windows x64
+
+Reported in the fork: during play the status kept switching between **Cemu ·
+obiettivi attivi** and **Attesa automatica**. Cause: the native feed had a
+one-slot mailbox and reset continuity whenever an unread packet was replaced.
+Cemu submits at most every 100 ms and the UI timer also ticks every ~100 ms, so
+two frames regularly arrived in one tick; each overwrite reset the engine and
+restarted the 750 ms gameplay gate. A simulation (real `MainForm` in native mode,
+a producer thread with 33 ms frames and the 100 ms cadence, stable gameplay)
+showed 11 waiting entries in 20 s before the change and only the initial gate
+afterwards. The feed is now a 16-packet FIFO drained in order at each tick;
+resets stay attached to their packet and only an overflow drops data (marked
+as a gap). An unread contradictory packet is now evaluated and breaks the
+confirmation streak instead of being discarded. Checked: 205 feed + 16 native UI
+checks (updated queue tests, overflow, two frames per tick), 322 core and 145 UI
+checks. Not checked: inside a running Cemu with the game.
+
 ## Minimised window crash — 2026-10-31, Windows x64
 
 Minimising the window (standalone app and the panel hosted in the Cemu fork) emptied

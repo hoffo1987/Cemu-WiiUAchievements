@@ -56,6 +56,16 @@ class NativeCemuUiTests
                 Check(store.Contains("wallet-10"), "native frames reach the real gameplay gate, engine and isolated progress store");
                 var saved = store.Get("wallet-10").Utc;
                 Check(((GameSnapshot)Get(form, "current")).Rupees == 10, "native gameplay refreshes the existing presentation");
+                // Cemu and the UI both run near 100 ms: two frames often arrive per tick.
+                bool steady = true;
+                for (ulong i = 0; i < 6; i++)
+                {
+                    feed.Submit(Packet(1400 + i * 200, 1, NativeCemuState.Running, 10)); Thread.Sleep(105);
+                    feed.Submit(Packet(1500 + i * 200, 1, NativeCemuState.Running, 10));
+                    Call(form, "Tick", null, EventArgs.Empty); Thread.Sleep(105);
+                    steady &= (string)Get(form, "statusTitle") != "Attesa automatica";
+                }
+                Check(steady, "a UI tick that finds two queued frames keeps recording active");
                 feed.Submit(Packet(1500, 2, NativeCemuState.Paused, 100)); Call(form, "Tick", null, EventArgs.Empty);
                 Check(Get(form, "current") == null && !store.Contains("wallet-100"), "emulator pause clears live presentation without evaluating frozen memory");
                 feed.Submit(Packet(1600, 3, NativeCemuState.Running, 100)); Call(form, "Tick", null, EventArgs.Empty);

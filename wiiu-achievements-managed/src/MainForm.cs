@@ -187,23 +187,25 @@ namespace WiiUAchievements
             if (!nativeListening || !recording || engine == null) return;
             try
             {
+                // Every queued observation is evaluated in order, each with its own capture time.
                 NativeCemuSample sample;
-                if (!nativeFeed.TryRead(out sample))
+                bool read = false;
+                while (nativeListening && recording && engine != null && nativeFeed.TryRead(out sample))
                 {
-                    if (!nativeFeed.IsFresh)
+                    read = true;
+                    if (sample.Reset) engine.Reset();
+                    if (sample.State != NativeCemuState.Running || sample.Snapshot == null)
                     {
-                        engine.Reset(); SetAutomaticWaiting("In attesa di nuovi fotogrammi della partita in Cemu.");
+                        engine.Reset();
+                        SetAutomaticWaiting(sample.State == NativeCemuState.Paused ? "Emulazione in pausa." : "Nessuna partita supportata attiva in Cemu.");
+                        continue;
                     }
-                    return; // Never count the same frozen frame twice.
+                    ProcessSample(sample.Snapshot);
                 }
-                if (sample.Reset) engine.Reset();
-                if (sample.State != NativeCemuState.Running || sample.Snapshot == null)
+                if (!read && !nativeFeed.IsFresh) // Never count the same frozen frame twice.
                 {
-                    engine.Reset();
-                    SetAutomaticWaiting(sample.State == NativeCemuState.Paused ? "Emulazione in pausa." : "Nessuna partita supportata attiva in Cemu.");
-                    return;
+                    engine.Reset(); SetAutomaticWaiting("In attesa di nuovi fotogrammi della partita in Cemu.");
                 }
-                ProcessSample(sample.Snapshot);
             }
             catch (Exception ex)
             {
