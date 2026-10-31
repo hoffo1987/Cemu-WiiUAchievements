@@ -1,3 +1,16 @@
+# Cemu 2.6 with Wii U Achievements
+
+Development fork with the existing Wii U Achievements engine and interface
+hosted **inside the Cemu process**. Open **Tools → Wii U Achievements**.
+See [setup, build and validation limits](WIIU-ACHIEVEMENTS.md).
+
+[Windows build and native smoke checks passed](https://github.com/hoffo1987/Cemu-WiiUAchievements/actions/runs/41240085236).
+PC smoke checks include the real Wind Waker HD EUR v0 title/menu and full Cemu
+restart. In-world save/load/award tests remain pending. The set still has 53
+experimental detectors and 40 unimplemented targets.
+
+---
+
 # **Cemu - Wii U emulator**
 
 [![Build Process](https://github.com/cemu-project/Cemu/actions/workflows/build.yml/badge.svg)](https://github.com/cemu-project/Cemu/actions/workflows/build.yml)

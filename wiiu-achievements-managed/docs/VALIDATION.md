@@ -62,6 +62,12 @@ in-world award, gameplay pause/load/death/slot transitions, sustained performanc
 or popup visibility above a real fullscreen game. No experimental mapping is
 certified, no ID/revision changed, and the Desktop Cemu executable was not replaced.
 
+The handoff package allowlist now includes the native integration, adapter/tests
+and the existing `FramePacing.cs` dependency. `package.ps1 -ValidateSourcesOnly
+-SkipTests` verified the **301-file** staged manifest and rebuilt solely from
+those staged sources. No ZIP was created; the earlier engine/UI/native test
+results were not counted as packaging-time tests.
+
 ## Fixed window and performance pass — 2026-10-31, Windows x64
 
 The window has one fixed size, 1120×840 logical pixels, and cannot be resized or
