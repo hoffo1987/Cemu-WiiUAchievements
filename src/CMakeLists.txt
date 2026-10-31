@@ -51,6 +51,9 @@ add_subdirectory(imgui)
 add_subdirectory(resource)
 add_subdirectory(asm)
 
+# Local Wii U Achievements extension; source is staged by the project script.
+include(WiiUAchievements/CMakeLists.txt)
+
 add_executable(CemuBin
 	main.cpp
 	mainLLE.cpp

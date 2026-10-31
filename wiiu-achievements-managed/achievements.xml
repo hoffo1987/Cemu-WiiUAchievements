@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<achievement-set revision="wwhd-alpha-1" game="The Wind Waker HD" status="experimental">
+  <achievement id="wallet-10" title="Primi spiccioli" description="Possiedi almeno 10 rupie nel portafoglio." field="rupees" threshold="10" points="1" />
+  <achievement id="wallet-100" title="Un piccolo tesoro" description="Possiedi almeno 100 rupie nel portafoglio." field="rupees" threshold="100" points="5" />
+  <achievement id="wallet-200" title="Una borsa tintinnante" description="Possiedi almeno 200 rupie nel portafoglio." field="rupees" threshold="200" points="5" />
+  <achievement id="wallet-500" title="Il tesoro del marinaio" description="Possiedi almeno 500 rupie nel portafoglio." field="rupees" threshold="500" points="10" />
+  <achievement id="wallet-1000" title="Un mare di rupie" description="Possiedi almeno 1000 rupie nel portafoglio." field="rupees" threshold="1000" points="10" />
+  <achievement id="hearts-4" title="Un cuore in più" description="Raggiungi almeno 4 cuori di capacità." field="max_health" threshold="16" points="5" />
+  <achievement id="hearts-6" title="Cuore d'avventura" description="Raggiungi almeno 6 cuori di capacità." field="max_health" threshold="24" points="10" />
+  <achievement id="hearts-10" title="Sempre più coraggioso" description="Raggiungi almeno 10 cuori di capacità." field="max_health" threshold="40" points="10" />
+  <achievement id="hearts-15" title="Il coraggio cresce" description="Raggiungi almeno 15 cuori di capacità." field="max_health" threshold="60" points="15" />
+  <achievement id="hearts-20" title="Un cuore leggendario" description="Raggiungi 20 cuori di capacità." field="max_health" threshold="80" points="25" />
+  <!-- Additive extension: stable IDs/revision keep existing local progress. -->
+  <achievement id="wallet-2500" title="La fortuna del navigatore" description="Possiedi almeno 2500 rupie nel portafoglio." field="rupees" threshold="2500" points="15" />
+  <achievement id="wallet-5000" title="Il forziere è pieno" description="Possiedi 5000 rupie nel portafoglio." field="rupees" threshold="5000" points="25" />
+  <achievement id="hearts-5" title="Pronto a salpare" description="Raggiungi almeno 5 cuori di capacità." field="max_health" threshold="20" points="5" />
+  <achievement id="hearts-8" title="Tempra da marinaio" description="Raggiungi almeno 8 cuori di capacità." field="max_health" threshold="32" points="10" />
+  <achievement id="hearts-12" title="Coraggio d'alto mare" description="Raggiungi almeno 12 cuori di capacità." field="max_health" threshold="48" points="10" />
+  <achievement id="hearts-18" title="Quasi una leggenda" description="Raggiungi almeno 18 cuori di capacità." field="max_health" threshold="72" points="15" />
+
+</achievement-set>

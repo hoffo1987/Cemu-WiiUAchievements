@@ -1,0 +1,113 @@
+<?xml version='1.0' encoding='utf-8'?>
+<achievement-presentation revision="wwhd-alpha-1">
+  <entry id="wallet-10" rarity="bronze" order="1600" title="Le prime 10 rupie" description="Tieni almeno 10 rupie nel portafoglio nello stesso momento." chapter="15 · Crescita" />
+  <entry id="wallet-100" rarity="bronze" order="1610" title="100 rupie in tasca" description="Tieni almeno 100 rupie nel portafoglio nello stesso momento." chapter="15 · Crescita" />
+  <entry id="wallet-200" rarity="bronze" order="1620" title="200 rupie in tasca" description="Tieni almeno 200 rupie nel portafoglio nello stesso momento." chapter="15 · Crescita" />
+  <entry id="wallet-500" rarity="bronze" order="1630" title="500 rupie in tasca" description="Tieni almeno 500 rupie nel portafoglio nello stesso momento." chapter="15 · Crescita" />
+  <entry id="wallet-1000" rarity="silver" order="1640" title="1.000 rupie in tasca" description="Tieni almeno 1.000 rupie nel portafoglio nello stesso momento." chapter="15 · Crescita" />
+  <entry id="hearts-4" rarity="bronze" order="1510" title="4 cuori di coraggio" description="Porta la salute massima ad almeno 4 cuori, anche se non sono pieni." chapter="15 · Crescita" />
+  <entry id="hearts-6" rarity="bronze" order="1530" title="6 cuori di coraggio" description="Porta la salute massima ad almeno 6 cuori, anche se non sono pieni." chapter="15 · Crescita" />
+  <entry id="hearts-10" rarity="silver" order="1550" title="10 cuori di coraggio" description="Porta la salute massima ad almeno 10 cuori, anche se non sono pieni." chapter="15 · Crescita" />
+  <entry id="hearts-15" rarity="silver" order="1570" title="15 cuori di coraggio" description="Porta la salute massima ad almeno 15 cuori, anche se non sono pieni." chapter="15 · Crescita" />
+  <entry id="hearts-20" rarity="gold" order="1590" title="20 cuori di coraggio" description="Porta la salute massima ad almeno 20 cuori, anche se non sono pieni." chapter="15 · Crescita" />
+  <entry id="wallet-2500" rarity="silver" order="1650" title="2.500 rupie in tasca" description="Tieni almeno 2.500 rupie nel portafoglio nello stesso momento." chapter="15 · Crescita" />
+  <entry id="wallet-5000" rarity="silver" order="1660" title="5.000 rupie in tasca" description="Tieni almeno 5.000 rupie nel portafoglio nello stesso momento." chapter="15 · Crescita" />
+  <entry id="hearts-5" rarity="bronze" order="1520" title="5 cuori di coraggio" description="Porta la salute massima ad almeno 5 cuori, anche se non sono pieni." chapter="15 · Crescita" />
+  <entry id="hearts-8" rarity="bronze" order="1540" title="8 cuori di coraggio" description="Porta la salute massima ad almeno 8 cuori, anche se non sono pieni." chapter="15 · Crescita" />
+  <entry id="hearts-12" rarity="silver" order="1560" title="12 cuori di coraggio" description="Porta la salute massima ad almeno 12 cuori, anche se non sono pieni." chapter="15 · Crescita" />
+  <entry id="hearts-18" rarity="silver" order="1580" title="18 cuori di coraggio" description="Porta la salute massima ad almeno 18 cuori, anche se non sono pieni." chapter="15 · Crescita" />
+  <entry id="story-heros-clothes" rarity="bronze" title="Il colore dell'avventura" description="Ottieni dalla nonna la tunica dell'eroe." chapter="01 · Isola Primula" />
+  <entry id="story-telescope" rarity="bronze" title="Un regalo all'orizzonte" description="Ottieni il cannocchiale di Aril." chapter="01 · Isola Primula" />
+  <entry id="story-hero-sword" rarity="bronze" description="Ottieni la Spada dell'Eroe." title="La prima lama" chapter="01 · Isola Primula" />
+  <entry id="story-hero-shield" rarity="bronze" title="Un ricordo di casa" description="Ottieni lo Scudo dell'Eroe." chapter="01 · Isola Primula" />
+  <entry id="story-spoils-bag" rarity="bronze" description="Ottieni il Borsello sulla nave dei pirati." title="Bottino da pirata" chapter="02 · Pirati" />
+  <entry id="story-fortress-escape" rarity="bronze" title="Un incontro in mare" description="Incontra Re Drakar dopo la prima visita alla Fortezza dei Demoni." chapter="02 · Pirati" />
+  <entry id="story-sail" rarity="bronze" description="Ottieni la vela normale per navigare con Re Drakar." title="Vento in poppa" chapter="03 · Isola Taura" />
+  <entry id="gear-picto-box" rarity="bronze" title="Il primo Immaginografo" description="Ottieni l'Immaginografo per scattare fotografie." chapter="03 · Isola Taura" />
+  <entry id="gear-deluxe-picto" rarity="silver" description="Ottieni l'Immaginografo SP, il potenziamento per le foto a colori." title="Ricordi a colori" chapter="03 · Isola Taura" />
+  <entry id="gear-bait-bag" rarity="bronze" title="Esche a bordo" description="Ottieni il Fagotto per conservare le esche." chapter="03 · Isola Taura" />
+  <entry id="story-wind-waker" rarity="bronze" title="La Bacchetta del Vento" description="Ottieni la Bacchetta del Vento da Re Drakar." chapter="04 · Drago" />
+  <entry id="collect-winds-requiem" rarity="bronze" title="Canzone del Vento" description="Impara la Canzone del Vento al santuario dell'Isola del Drago." chapter="04 · Drago" />
+  <entry id="gear-delivery-bag" rarity="bronze" title="Posta in viaggio" description="Ottieni la Cartella per trasportare lettere e oggetti da consegnare." chapter="04 · Drago" />
+  <entry id="gear-grappling-hook" rarity="bronze" title="Appigli da pirata" description="Ottieni il Rampino nella Caverna del Drago." chapter="04 · Drago" />
+  <entry id="story-din-pearl" rarity="silver" title="Il drago può riposare" description="Sconfiggi Gohma e ottieni la Perla di Din." chapter="04 · Drago" />
+  <entry id="gear-deku-leaf" rarity="bronze" title="Il primo volo" description="Ottieni la Foglia Deku dall'Albero Deku." chapter="05 · Bosco" />
+  <entry id="gear-boomerang" rarity="bronze" title="Andata e ritorno" description="Ottieni il Boomerang nel Boschi Proibiti." chapter="05 · Bosco" />
+  <entry id="story-farore-pearl" rarity="silver" title="Il bosco ritrova la voce" description="Sconfiggi Kardemos e ottieni la Perla di Farore." chapter="05 · Bosco" />
+  <entry id="gear-bombs" rarity="bronze" description="Ottieni le Bombe e sblocca il loro utilizzo." title="Un carico esplosivo" chapter="06 · Jabun" />
+  <entry id="story-nayru-pearl" rarity="silver" title="Una luce nella tempesta" description="Ottieni la Perla di Nayru da Jabun." chapter="06 · Jabun" />
+  <entry id="side-grandma" rarity="bronze" title="Una zuppa che sa di casa" description="Guarisci la nonna e tieni una porzione di Zuppa della Casa in un'ampolla." chapter="06 · Jabun" />
+  <entry id="collect-command-melody" rarity="bronze" order="710" title="Canto del Burattino" description="Impara il Canto del Burattino nella Torre degli Spiriti." chapter="07 · Torre" />
+  <entry id="gear-bow" rarity="bronze" order="720" title="Mira da eroe" description="Ottieni l'Arco dell'Eroe nella Torre degli Spiriti." chapter="07 · Torre" />
+  <entry id="story-gohdan" rarity="silver" order="730" title="Il giudizio di Kuznar" description="Sconfiggi Kuznar, il boss della Torre degli Spiriti." chapter="07 · Torre" />
+  <entry id="story-master-sword" rarity="silver" description="Ottieni per la prima volta la Spada Suprema." title="Una lama dal passato" chapter="08 · Hyrule" />
+  <entry id="collect-ballad-gales" rarity="bronze" description="Impara la Melodia del Tifone, che permette di viaggiare con i cicloni." title="Melodia del Tifone" chapter="08 · Hyrule" />
+  <entry id="gear-skull-hammer" rarity="bronze" title="Un colpo deciso" description="Ottieni il Martello nella Fortezza dei Demoni." chapter="09 · Fortezza" />
+  <entry id="story-helmaroc" rarity="silver" title="Mai più in gabbia" description="Sconfiggi Re Elmaroc nella Fortezza dei Demoni." chapter="09 · Fortezza" />
+  <entry id="story-zelda" rarity="silver" title="L'eredità del regno" description="Scopri la vera identità di Dazel nel castello di Hyrule." chapter="09 · Fortezza" />
+  <entry id="gear-elemental-arrows" rarity="bronze" title="Fuoco e ghiaccio" description="Ottieni il potenziamento delle frecce di fuoco e di ghiaccio." chapter="10 · Terra" />
+  <entry id="gear-power-bracelets" rarity="bronze" title="La forza sotto la lava" description="Ottieni i Superbracciali nella Montagna di Fuoco." chapter="10 · Terra" />
+  <entry id="gear-iron-boots" rarity="bronze" title="Piedi ben piantati" description="Ottieni gli Calzari di Piombo sull'Isola Gelata." chapter="10 · Terra" />
+  <entry id="collect-earth-lyric" rarity="bronze" title="Inno della Terra" description="Impara l'Inno della Terra da Laruto." chapter="10 · Terra" />
+  <entry id="gear-mirror-shield" rarity="bronze" order="1006" title="Riflessi d'eroe" description="Ottieni lo Scudo Specchio nel Santuario della Terra." chapter="10 · Terra" />
+  <entry id="story-jalhalla" rarity="silver" order="1007" title="Luce nelle tenebre" description="Sconfiggi Jay-Harla e ottieni il primo potenziamento della Spada Suprema." chapter="10 · Terra" />
+  <entry id="collect-wind-aria" rarity="bronze" title="Inno del Vento" description="Impara l'Inno del Vento da Fado." chapter="11 · Vento" />
+  <entry id="gear-hookshot" rarity="bronze" order="1103" title="Nessuna distanza" description="Ottieni l'Arpione nel Santuario del Vento." chapter="11 · Vento" />
+  <entry id="story-molgera" rarity="gold" order="1104" title="Il vento torna a cantare" description="Sconfiggi Gayla e restituisci il pieno potere alla Spada Suprema." chapter="11 · Vento" />
+  <entry id="story-triforce-first" rarity="bronze" title="Un frammento di coraggio" description="Ottieni almeno un frammento della Triforza del Coraggio." chapter="12 · Triforza" />
+  <entry id="story-triforce-complete" rarity="gold" title="Otto frammenti di coraggio" description="Ottieni tutti gli 8 frammenti della Triforza del Coraggio." chapter="12 · Triforza" />
+  <entry id="story-hyrule-barrier" rarity="bronze" title="Oltre l'ultima barriera" description="Abbatti la barriera di Hyrule che blocca la strada alla Torre di Ganon." chapter="13 · Finale" />
+  <entry id="story-light-arrows" rarity="bronze" title="Una freccia di luce" description="Ottieni le Frecce di Luce nella Torre di Ganon." chapter="13 · Finale" />
+  <entry id="gear-swift-sail" rarity="silver" description="Ottieni la Vela Rapida, il potenziamento esclusivo della versione HD." order="1400" title="Il vento mi segue" chapter="14 · Extra" />
+  <entry id="gear-magic-armor" rarity="silver" description="Ottieni l'Corazza Magica." order="1402" title="Una protezione preziosa" chapter="14 · Extra" />
+  <entry id="gear-magic-double" rarity="silver" order="1404" title="Magia raddoppiata" description="Raddoppia la capacità massima della barra magica." chapter="14 · Extra" />
+  <entry id="gear-bombs-99" rarity="silver" order="1406" title="Artificiere del mare" description="Potenzia la borsa fino a una capacità massima di 99 bombe." chapter="14 · Extra" />
+  <entry id="gear-arrows-99" rarity="silver" order="1408" title="Una faretra senza fondo" description="Potenzia la faretra fino a una capacità massima di 99 frecce." chapter="14 · Extra" />
+  <entry id="gear-wallet-max" rarity="silver" order="1410" title="Spazio per ogni tesoro" description="Potenzia il portafoglio fino a una capacità di 5.000 rupie." chapter="14 · Extra" />
+  <entry id="collect-song-passing" rarity="bronze" order="1456" title="Dal giorno alla notte" description="Impara da Gill la Sonata in Dì Notturno." chapter="14 · Extra" />
+  <entry id="collect-songs-6" rarity="silver" order="1458" title="Le sei melodie" description="Impara tutte le 6 melodie della Bacchetta del Vento." chapter="14 · Extra" />
+  <entry id="collect-bottles-4" rarity="silver" order="1454" title="Quattro ampolle" description="Ottieni tutte le 4 ampolle per pozioni, fate e altri contenuti." chapter="14 · Extra" />
+  <entry id="explore-chart-10" rarity="bronze" order="1416" title="Dieci settori di mare" description="Porta ad almeno 10 su 49 i settori segnati sulla Carta Nautica." chapter="14 · Extra" />
+  <entry id="explore-chart-25" rarity="silver" order="1418" title="Metà del Grande Mare" description="Porta ad almeno 25 su 49 i settori segnati sulla Carta Nautica." chapter="14 · Extra" />
+  <entry id="explore-chart-49" rarity="gold" order="1420" title="Il mare non ha segreti" description="Completa tutti i 49 settori della Carta Nautica." chapter="14 · Extra" />
+  <entry id="story-tower-rises" rarity="silver" order="700" title="Tre perle, una torre" description="Colloca le Perle di Din, Farore e Nayru e fai emergere la Torre degli Spiriti." chapter="07 · Torre" />
+  <entry id="story-medli-sage" rarity="silver" order="1005" title="La saggia della terra" description="Risveglia Famirè come saggia del Santuario della Terra." chapter="10 · Terra" />
+  <entry id="story-makar-sage" rarity="silver" order="1102" title="Il saggio del vento" description="Risveglia Macorè come saggio del Santuario del Vento." chapter="11 · Vento" />
+  <entry id="story-puppet-ganon" rarity="silver" order="1310" title="I fili di Triganon" description="Sconfiggi tutte e tre le forme di Triganon nella Torre di Ganon." chapter="13 · Finale" />
+  <entry id="story-ganondorf" rarity="gold" order="1320" title="Un nuovo orizzonte" description="Sconfiggi Ganondorf nello scontro finale e completa l'avventura." chapter="13 · Finale" />
+  <entry id="explore-salvage-first" rarity="bronze" order="1422" title="Il primo tesoro sommerso" description="Recupera un forziere indicato da una Mappa del Tesoro normale." chapter="14 · Extra" />
+  <entry id="explore-salvage-10" rarity="silver" order="1424" title="Dieci tesori sommersi" description="Recupera 10 forzieri diversi indicati dalle Mappe del Tesoro normali." chapter="14 · Extra" />
+  <entry id="explore-salvage-46" rarity="gold" order="1426" title="Tutti i tesori sommersi" description="Recupera i forzieri di tutte le 46 Mappe del Tesoro della versione HD." chapter="14 · Extra" />
+  <entry id="explore-ghost-ship" rarity="silver" order="1428" title="A bordo del mistero" description="Sconfiggi i nemici della Nave Fantasma e apri il forziere del suo tesoro." chapter="14 · Extra" />
+  <entry id="explore-big-octo" rarity="bronze" order="1412" title="Occhi sull'abisso" description="Sconfiggi almeno un Octoboss nel Grande Mare." chapter="14 · Extra" />
+  <entry id="explore-all-octos" rarity="silver" order="1414" title="Un mare senza Octoboss" description="Sconfiggi tutti i 6 Octoboss del Grande Mare." chapter="14 · Extra" />
+  <entry id="explore-savage-30" rarity="silver" order="1430" title="Il tesoro del piano 30" description="Apri il forziere della Triforza al piano 30 del Dedalo dei Mostri di Primula." chapter="14 · Extra" />
+  <entry id="explore-savage-50" rarity="gold" order="1432" title="Il fondo del labirinto" description="Apri il forziere al piano 50 del Dedalo dei Mostri e ottieni l'Amuleto dell'Eroe." chapter="14 · Extra" />
+  <entry id="collect-heart-piece-first" rarity="bronze" order="1434" title="Un quarto di speranza" description="Ottieni almeno un Frammento di Cuore; i Portacuori interi non contano." chapter="14 · Extra" />
+  <entry id="collect-heart-pieces-12" rarity="silver" order="1436" title="Dodici frammenti di cuore" description="Ottieni almeno 12 dei 44 Frammenti di Cuore, inclusi quelli già convertiti." chapter="14 · Extra" />
+  <entry id="collect-heart-pieces-44" rarity="gold" order="1438" title="Ogni frammento al suo posto" description="Ottieni tutti i 44 Frammenti di Cuore, senza contare i Portacuori dei boss." chapter="14 · Extra" />
+  <entry id="collect-treasure-charts-10" rarity="bronze" order="1440" title="Dieci Mappe del Tesoro" description="Ottieni 10 Mappe del Tesoro diverse, escluse le carte speciali e della Triforza." chapter="14 · Extra" />
+  <entry id="collect-treasure-charts-25" rarity="silver" order="1442" title="Venticinque mappe" description="Ottieni 25 delle 46 Mappe del Tesoro normali della versione HD." chapter="14 · Extra" />
+  <entry id="collect-treasure-charts-46" rarity="gold" order="1444" title="Tutte le Mappe del Tesoro" description="Ottieni tutte le 46 Mappe del Tesoro normali presenti nella versione HD." chapter="14 · Extra" />
+  <entry id="collect-triforce-charts" rarity="silver" order="1446" title="Tre mappe da decifrare" description="Fai decifrare da Tingle tutte e 3 le Mappe della Triforza della versione HD." chapter="14 · Extra" />
+  <entry id="collect-tingle-statues-5" rarity="silver" order="1448" title="Le cinque statue di Tingle" description="Apri i 5 forzieri delle statue di Tingle nascosti nei dungeon." chapter="14 · Extra" />
+  <entry id="collect-gallery-first" rarity="bronze" order="1450" title="La prima miniatura" description="Ritira la prima miniatura completata da Mastro Miniato alla Galleria Minitendo." chapter="14 · Extra" />
+  <entry id="collect-gallery-complete" rarity="gold" order="1452" title="Un mare in miniatura" description="Completa la Galleria Minitendo in HD, inclusa la miniatura di Mingle." chapter="14 · Extra" />
+  <entry id="side-killer-bees" rarity="bronze" title="Trovati tutti!" description="Trova i 4 Fanatici Quattro a nascondino sull'Isola Taura e ritira il premio." chapter="03 · Isola Taura" order="350" />
+  <entry id="side-sinking-ships" rarity="bronze" title="Centro e affondato" description="Vinci la prima partita alla battaglia navale di Arraffaele e ritira il premio." chapter="03 · Isola Taura" order="360" />
+  <entry id="side-sinking-ships-20" rarity="silver" title="Una mira da venti colpi" description="Vinci la battaglia navale con 20 colpi o meno e ricevi la Mappa del Tesoro 23." chapter="03 · Isola Taura" order="370" />
+  <entry id="side-mail-25" rarity="silver" title="Postino provetto" description="Smista almeno 25 lettere in una singola prova all'ufficio dell'Isola del Drago." chapter="04 · Drago" order="490" />
+  <entry id="side-orca-500" rarity="silver" order="1478" title="Cinquecento colpi" description="Totalizza almeno 500 colpi nella sfida di Sensei Ken e ritira il Frammento di Cuore." chapter="14 · Extra" />
+  <entry id="side-hurricane-spin" rarity="silver" order="1476" title="La tecnica dell'uragano" description="Consegna 10 Emblemi del Guerriero a Sensei Ken e impara l'Attacco Uragano." chapter="14 · Extra" />
+  <entry id="side-cabana" rarity="silver" order="1474" title="Una villa tutta mia" description="Dopo il primo dono, consegna 20 Portafelicità a Miss Mary e ottieni l'Invito alla Villa." chapter="14 · Extra" />
+  <entry id="side-joy-pendants-40" rarity="silver" order="1470" title="La carta della maestra" description="Dopo l'Invito alla Villa, dona altri 20 Portafelicità a Miss Mary e ricevi la Mappa 45." chapter="14 · Extra" />
+  <entry id="side-forest-water" rarity="silver" order="1472" title="Otto alberelli in fiore" description="Rianima tutti gli 8 alberelli con acqua della foresta prima che scada e ritira il premio." chapter="14 · Extra" />
+  <entry id="side-mila" rarity="bronze" order="1482" title="Una seconda possibilità" description="Concludi la vicenda notturna di Mina e ricevi la sua ampolla." chapter="14 · Extra" />
+  <entry id="side-maggie" rarity="bronze" order="1468" title="Una lettera per Maggy" description="Consegna a Maggy la risposta del suo innamorato e ritira il premio." chapter="14 · Extra" />
+  <entry id="side-lighthouse" rarity="bronze" order="1466" title="Un faro nella notte" description="Riaccendi il faro di Taura e ritira il Frammento di Cuore dal custode Galbino." chapter="14 · Extra" />
+  <entry id="side-flight-control" rarity="silver" order="1464" title="Oltre il traguardo" description="Supera il traguardo della Piattaforma di Volo con la Foglia Deku e ritira il premio." chapter="14 · Extra" />
+  <entry id="side-spectacle" rarity="bronze" order="1462" title="Artiglieria di precisione" description="Vinci la prima prova dei barili all'Isola Occhiali e ritira il Frammento di Cuore." chapter="14 · Extra" />
+  <entry id="side-trading" rarity="silver" order="1460" title="L'ultimo scambio" description="Scambia la Statua del Gran Mercante all'Isola del Pesce e ritira il Frammento di Cuore." chapter="14 · Extra" />
+  <entry id="side-town-decoration" rarity="silver" order="1480" title="Una città in festa" description="Decora tutti i 14 piedistalli esterni di Taura e ritira il Frammento di Cuore da Sam." chapter="14 · Extra" />
+  <entry id="side-golden-feathers" rarity="bronze" order="1484" title="Piume per una promessa" description="Consegna 20 Piume Dorate a Fagalore e ritira la ricompensa spedita per posta." chapter="14 · Extra" />
+</achievement-presentation>

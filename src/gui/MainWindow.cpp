@@ -33,6 +33,7 @@
 #include "gui/EmulatedUSBDevices/EmulatedUSBDeviceFrame.h"
 
 #include "Cafe/CafeSystem.h"
+#include "WiiUAchievements/WiiUAchievementsHost.h"
 
 #include "util/helpers/SystemException.h"
 #include "gui/DownloadGraphicPacksWindow.h"
@@ -112,6 +113,7 @@ enum
 	MAINFRAME_MENU_ID_TOOLS_TITLE_MANAGER,
 	MAINFRAME_MENU_ID_TOOLS_DOWNLOAD_MANAGER,
 	MAINFRAME_MENU_ID_TOOLS_EMULATED_USB_DEVICES,
+	MAINFRAME_MENU_ID_TOOLS_WIIU_ACHIEVEMENTS,
 	// cpu
 	// cpu->timer speed
 	MAINFRAME_MENU_ID_TIMER_SPEED_1X = 20700,
@@ -189,6 +191,7 @@ EVT_MENU(MAINFRAME_MENU_ID_TOOLS_MEMORY_SEARCHER, MainWindow::OnToolsInput)
 EVT_MENU(MAINFRAME_MENU_ID_TOOLS_TITLE_MANAGER, MainWindow::OnToolsInput)
 EVT_MENU(MAINFRAME_MENU_ID_TOOLS_DOWNLOAD_MANAGER, MainWindow::OnToolsInput)
 EVT_MENU(MAINFRAME_MENU_ID_TOOLS_EMULATED_USB_DEVICES, MainWindow::OnToolsInput)
+EVT_MENU(MAINFRAME_MENU_ID_TOOLS_WIIU_ACHIEVEMENTS, MainWindow::OnToolsInput)
 // cpu menu
 EVT_MENU(MAINFRAME_MENU_ID_TIMER_SPEED_8X, MainWindow::OnDebugSetting)
 EVT_MENU(MAINFRAME_MENU_ID_TIMER_SPEED_4X, MainWindow::OnDebugSetting)
@@ -289,6 +292,7 @@ MainWindow::MainWindow()
 	CafeSystem::SetImplementation(this);
 
 	RecreateMenu();
+	WiiUAchievements::Initialize();
 	SetClientSize(1280, 720);
 	SetIcon(wxICON(M_WND_ICON128));
 
@@ -431,6 +435,7 @@ void MainWindow::OnClose(wxCloseEvent& event)
 	event.Skip();
 
     CafeSystem::Shutdown();
+	WiiUAchievements::Shutdown();
 	DestroyCanvas();
 }
 
@@ -1465,6 +1470,9 @@ void MainWindow::OnToolsInput(wxCommandEvent& event)
 	const auto id = event.GetId();
 	switch (id)
 	{
+	case MAINFRAME_MENU_ID_TOOLS_WIIU_ACHIEVEMENTS:
+		WiiUAchievements::Show();
+		break;
 	case MAINFRAME_MENU_ID_TOOLS_MEMORY_SEARCHER:
 	{
 		if (m_toolWindow)
@@ -2164,6 +2172,10 @@ void MainWindow::RecreateMenu()
 	toolsMenu->Append(MAINFRAME_MENU_ID_TOOLS_TITLE_MANAGER, _("&Title Manager"));
 	toolsMenu->Append(MAINFRAME_MENU_ID_TOOLS_DOWNLOAD_MANAGER, _("&Download Manager"));
 	toolsMenu->Append(MAINFRAME_MENU_ID_TOOLS_EMULATED_USB_DEVICES, _("&Emulated USB Devices"));
+#ifdef _WIN32
+	toolsMenu->AppendSeparator();
+	toolsMenu->Append(MAINFRAME_MENU_ID_TOOLS_WIIU_ACHIEVEMENTS, "Wii U &Achievements");
+#endif
 
 	m_menuBar->Append(toolsMenu, _("&Tools"));
 

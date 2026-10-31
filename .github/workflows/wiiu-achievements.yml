@@ -1,0 +1,90 @@
+name: Cemu with Wii U Achievements (Windows)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wiiu-achievements-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-clr-smoke:
+    runs-on: windows-2022
+    timeout-minutes: 15
+    steps:
+      - name: Check out integration sources only
+        uses: actions/checkout@v4
+
+      - name: Compile real host and run CLR / engine / persistence smoke checks
+        shell: pwsh
+        run: |
+          & ./wiiu-achievements-managed/native-tests/run-smoke.ps1 -SourceDirectory $env:GITHUB_WORKSPACE
+
+  windows-x64:
+    needs: native-clr-smoke
+    runs-on: windows-2022
+    timeout-minutes: 180
+    env:
+      VCPKG_ROOT: ${{ github.workspace }}/dependencies/vcpkg
+      VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/.vcpkg-binary-cache
+    steps:
+      - name: Check out the fork and pinned upstream dependencies
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: CMake 3.29
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.29.0'
+
+      - name: Cache compiled Cemu dependencies
+        uses: actions/cache@v4
+        with:
+          path: .vcpkg-binary-cache
+          key: cemu-v26-windows-x64-static-${{ hashFiles('vcpkg.json', 'dependencies/vcpkg_overlay_ports/**') }}
+
+      - name: Bootstrap vcpkg
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path $env:VCPKG_DEFAULT_BINARY_CACHE -Force | Out-Null
+          & ./dependencies/vcpkg/bootstrap-vcpkg.bat -disableMetrics
+          if ($LASTEXITCODE -ne 0) { throw 'vcpkg bootstrap failed.' }
+
+      - name: Build and test managed engine, then build native Cemu
+        shell: pwsh
+        run: |
+          & ./wiiu-achievements-managed/build-cemu.ps1 -SourceDirectory $env:GITHUB_WORKSPACE
+
+      - name: Prepare standalone Windows build
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path artifacts -Force | Out-Null
+          Copy-Item -LiteralPath bin/Cemu.exe -Destination artifacts/Cemu.exe
+          Copy-Item -LiteralPath bin/WiiUAchievements -Destination artifacts/WiiUAchievements -Recurse
+          foreach ($name in @('resources', 'gameProfiles', 'controllerProfiles')) {
+            $folder = Join-Path bin $name
+            if (Test-Path -LiteralPath $folder) { Copy-Item -LiteralPath $folder -Destination (Join-Path artifacts $name) -Recurse }
+          }
+          Copy-Item -LiteralPath LICENSE.txt -Destination artifacts/CEMU-LICENSE.txt
+          New-Item -ItemType Directory -Path artifacts/notices -Force | Out-Null
+          Copy-Item -LiteralPath wiiu-achievements-managed/assets/fonts/OFL.txt -Destination artifacts/notices/Nunito-OFL.txt
+          Copy-Item -LiteralPath wiiu-achievements-managed/docs/ARTWORK-SOURCES.md -Destination artifacts/notices/ARTWORK-SOURCES.md
+          @'
+          Cemu remains subject to its upstream licence (CEMU-LICENSE.txt).
+          The Wii U Achievements project has not selected a redistribution licence.
+          Embedding its module does not relicense its source or owner-supplied artwork.
+          See Wii U Achievements HANDOFF.md and artwork provenance for that material.
+          This development integration is not a verified complete achievement set.
+          '@ | Set-Content -LiteralPath artifacts/notices/WIIU-ACHIEVEMENTS.txt -Encoding utf8
+
+      - name: Upload development build (no games, keys, logs or user progress)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Cemu-2.6-WiiUAchievements-windows-x64
+          path: artifacts/
+          if-no-files-found: error
+          retention-days: 14

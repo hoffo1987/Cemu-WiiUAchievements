@@ -1,5 +1,6 @@
 #include "gui/guiWrapper.h"
 #include "Debugger.h"
+#include "WiiUAchievements/WiiUAchievementsHost.h"
 #include "Cafe/OS/RPL/rpl_structs.h"
 #include "Cemu/PPCAssembler/ppcAssembler.h"
 #include "Cafe/HW/Espresso/Recompiler/PPCRecompiler.h"
@@ -561,6 +562,7 @@ void debugger_enterTW(PPCInterpreter_t* hCPU)
 
 	// handle breakpoints
 	debuggerState.debugSession.isTrapped = true;
+	WiiUAchievements::SetPaused(true);
 	debuggerState.debugSession.debuggedThreadMPTR = MEMPTR<OSThread_t>(coreinit::OSGetCurrentThread()).GetMPTR();
 	debuggerState.debugSession.instructionPointer = hCPU->instructionPointer;
 	debuggerState.debugSession.hCPU = hCPU;
@@ -610,6 +612,7 @@ void debugger_enterTW(PPCInterpreter_t* hCPU)
 	}
 
 	debuggerState.debugSession.isTrapped = false;
+	WiiUAchievements::SetPaused(false);
 	debuggerState.debugSession.hCPU = nullptr;
 	debuggerWindow_updateViewThreadsafe2();
 	debuggerWindow_notifyRun();

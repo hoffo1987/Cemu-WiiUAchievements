@@ -6,6 +6,7 @@
 #include "Cafe/OS/libs/coreinit/coreinit_Time.h"
 #include "Cafe/OS/libs/coreinit/coreinit_Thread.h"
 #include "Cafe/CafeSystem.h"
+#include "WiiUAchievements/WiiUAchievementsHost.h"
 #include "Cafe/HW/Latte/Core/LattePM4.h"
 
 #include "GX2_Command.h"
@@ -48,6 +49,7 @@ uint64 lastSwapTime = 0;
 
 void gx2Export_GX2SwapScanBuffers(PPCInterpreter_t* hCPU)
 {
+	WiiUAchievements::FrameSubmitted();
 	cemuLog_log(LogType::GX2, "GX2SwapScanBuffers()");
 
 	bool isPokken = false;

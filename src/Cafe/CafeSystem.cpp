@@ -16,6 +16,7 @@
 #include "Common/cpu_features.h"
 #include "input/InputManager.h"
 #include "Cafe/CafeSystem.h"
+#include "WiiUAchievements/WiiUAchievementsHost.h"
 #include "Cafe/TitleList/TitleList.h"
 #include "Cafe/TitleList/GameInfo.h"
 #include "Cafe/OS/libs/coreinit/coreinit_Alarm.h"
@@ -843,6 +844,7 @@ namespace CafeSystem
 		for(auto& module : s_iosuModules)
 			module->TitleStart();
 		cemu_initForGame();
+		WiiUAchievements::TitleStarted();
 		// enter scheduler
 		if (ActiveSettings::GetCPUMode() == CPUMode::MulticoreRecompiler && !LaunchSettings::ForceInterpreter())
 			coreinit::OSSchedulerBegin(3);
@@ -987,6 +989,7 @@ namespace CafeSystem
 	{
 		if(!sSystemRunning)
 			return;
+		WiiUAchievements::TitleStopped();
         coreinit::OSSchedulerEnd();
         Latte_Stop();
         // reset Cafe OS userspace modules
