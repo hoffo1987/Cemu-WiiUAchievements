@@ -558,6 +558,13 @@ class UiTests
                 PartialPaintChecks(form, output);
                 CloudChecks(form, output);
                 AutomaticWaitingChecks(form, output);
+                // Minimising empties the client area; the layout and card cache must not follow it to zero.
+                var restoredGrid = (RectangleF)Get(form, "gridRect");
+                form.WindowState = FormWindowState.Minimized; Settle();
+                Call(form, "ClearTileImages"); Call(form, "PrewarmTiles", 100f, 1000.0);
+                Check((RectangleF)Get(form, "gridRect") == restoredGrid, "A minimised window keeps its layout and can prepare cards");
+                form.WindowState = FormWindowState.Normal; Settle();
+                Check(form.Visible && (RectangleF)Get(form, "gridRect") == restoredGrid, "Restoring a minimised window brings back the same layout");
                 var curated = (List<Achievement>)Get(form, "rules");
                 Check(Art.For(curated.Single(a => a.Id == "wallet-5000"), curated).Tier == Tier.Silver &&
                     Art.For(curated.Single(a => a.Id == "hearts-20"), curated).Tier == Tier.Gold,

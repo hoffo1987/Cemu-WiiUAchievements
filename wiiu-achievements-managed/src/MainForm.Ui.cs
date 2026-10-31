@@ -53,7 +53,10 @@ namespace WiiUAchievements
         bool focusVisible, cloudPage;
         RectangleF bannerRect, gridRect, drawerRect, sheetRect, dialogRect, statusPill;
 
-        float W { get { return ClientSize.Width / scale; } }
+        // A minimised window has an empty client area: the layout keeps the fixed window size,
+        // otherwise cards (and their cached bitmaps) would be sized to zero.
+        bool Collapsed { get { return WindowState == FormWindowState.Minimized || ClientSize.Width <= 0 || ClientSize.Height <= 0; } }
+        float W { get { return Collapsed ? WindowW : ClientSize.Width / scale; } }
         // The picture part of the banner gives way on short windows so more cards stay in view.
         float HeroH { get { return Math.Max(116, Math.Min(172, 116 + (H - 680) * 0.5f)); } }
         // Game look for banner-side content; buttons, bars and settings keep the system style.
@@ -72,7 +75,7 @@ namespace WiiUAchievements
             }
         }
         void CloseBannerVideo() { if (video != null) video.Dispose(); video = null; videoOpened = false; }
-        float H { get { return ClientSize.Height / scale; } }
+        float H { get { return Collapsed ? WindowH : ClientSize.Height / scale; } }
         int ActiveLayer { get { return dialogTarget > 0 ? 2 : sheetTarget > 0 ? 1 : menuTarget > 0 ? 3 : 0; } }
 
         static CultureInfo MakeCulture()
@@ -112,6 +115,7 @@ namespace WiiUAchievements
             Resize += delegate
             {
                 if (WindowState == FormWindowState.Maximized) { WindowState = FormWindowState.Normal; return; }
+                if (Collapsed) return; // Restoring resizes again and rebuilds the layout.
                 FramePacing.Reset(); ClearTileImages(); ClearLayers(); Arrange(); PlaceFields(); Kick();
             };
             Shown += delegate { introStart = Motion.Reduced ? -10 : (float)clock.Elapsed.TotalSeconds; Kick(); };

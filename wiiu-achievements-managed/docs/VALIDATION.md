@@ -1,5 +1,20 @@
 # Validation record and reproduction
 
+## Minimised window crash — 2026-10-31, Windows x64
+
+Minimising the window (standalone app and the panel hosted in the Cemu fork) emptied
+the client area; the resize handler then laid the cards out at zero size and the idle
+card prewarm built a zero-width bitmap (`ArgumentException`, "Parametro non valido").
+The exception left the message loop from `Application.Idle`, so the window was
+destroyed; in the fork the message was then kept as a startup error and shown on
+every **Tools → Wii U Achievements**. Layout now keeps the fixed window size while
+minimised and the resize handler skips the empty state. Checked: a harness of the
+fork's STA/`ApplicationContext` flow (minimise → reopen, close → reopen) reproduced
+the error before and no longer fails; two new UI checks fail on the old code and
+pass now; 322 core checks and 193 feed + 15 native UI checks pass. The existing
+cloud UI check ("Account request runs in background…") fails identically with and
+without this change. Not checked: inside a running Cemu with the game.
+
 ## Cemu in-process integration attempt — 2026-10-31, Windows x64
 
 Implemented an official-v2.6 pinned fork overlay: in-process .NET Framework CLR
