@@ -2,12 +2,17 @@ name: Cemu with Wii U Achievements (Windows)
 
 on:
   workflow_dispatch:
+    inputs:
+      validation_only:
+        description: 'Run native CLR and managed adapter checks without rebuilding Cemu'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
 
 concurrency:
-  group: wiiu-achievements-${{ github.ref }}
+  group: wiiu-achievements-${{ github.ref }}-${{ inputs.validation_only }}
   cancel-in-progress: true
 
 jobs:
@@ -22,9 +27,12 @@ jobs:
         shell: pwsh
         run: |
           & ./wiiu-achievements-managed/native-tests/run-smoke.ps1 -SourceDirectory $env:GITHUB_WORKSPACE
+          & powershell -NoProfile -ExecutionPolicy Bypass -File ./wiiu-achievements-managed/tests/run-native.ps1 -OutputDirectory ./native-feed-tests
+          if ($LASTEXITCODE -ne 0) { throw 'Native adapter regressions failed.' }
 
   windows-x64:
     needs: native-clr-smoke
+    if: ${{ !inputs.validation_only }}
     runs-on: windows-2022
     timeout-minutes: 180
     env:
