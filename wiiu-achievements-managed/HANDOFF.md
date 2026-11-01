@@ -1,5 +1,13 @@
 # Current documentation entry point
 
+**Unlock dates visible (2026-11-01):** narrow cards previously suppressed the
+whole earned date when it did not fit after the state chip. Unlocked card
+footers now reserve space for a check and full numeric local date/time;
+details keep their long date. Existing UTC records/IDs/revision are unchanged,
+so saved awards benefit without migration. Root EXE and the local integrated
+fork's managed module were updated after the owner closed Cemu. See the latest
+`docs/VALIDATION.md` entry for synthetic rendering checks and live limits.
+
 **All remaining catalog detectors (2026-11-01):** all 40 formerly planned IDs
 now have shared executable conditions: 110 active, 93 experimental, zero
 unimplemented catalog targets. Read `docs/DETECTOR-EXPANSION.md` for sources,

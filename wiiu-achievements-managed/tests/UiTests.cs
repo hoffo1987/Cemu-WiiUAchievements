@@ -292,6 +292,48 @@ class UiTests
             Check(detailMisfits.Count == 0, "All 110 titles, descriptions and requirements fit the detail card (" + String.Join(", ", detailMisfits) + ")");
         }
     }
+    static long UnlockFooterPixels(MainForm form, Achievement achievement, DateTime utc, float scale)
+    {
+        using (var bitmap = new Bitmap((int)(340 * scale), (int)(132 * scale)))
+        using (var g = Graphics.FromImage(bitmap))
+        {
+            g.Clear(Color.White); g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+            g.ScaleTransform(scale, scale);
+            var footer = (RectangleF)Call(form, "FooterRect", new RectangleF(0, 0, 340, 132), achievement);
+            Call(form, "DrawProgress", g, achievement, new Unlock { Id = achievement.Id, Utc = utc }, footer, false);
+            long pixels = 0;
+            for (int y = (int)(footer.Top * scale); y < (int)(footer.Bottom * scale); y++)
+                for (int x = (int)(footer.Left * scale); x < (int)(footer.Right * scale); x++)
+                    pixels += bitmap.GetPixel(x, y).ToArgb();
+            return pixels;
+        }
+    }
+    static void UnlockDateChecks(MainForm form, string output)
+    {
+        var rules = ((List<Achievement>)Get(form, "rules")).Where(a => !a.IsPlanned).ToList();
+        var utc = new DateTime(2026, 9, 28, 10, 18, 0, DateTimeKind.Utc);
+        foreach (float scale in new[] { 1f, 1.25f, 1.5f, 2f })
+        {
+            var missing = rules.Where(a => UnlockFooterPixels(form, a, utc, scale) == UnlockFooterPixels(form, a, utc.AddDays(1), scale) ||
+                UnlockFooterPixels(form, a, utc, scale) == UnlockFooterPixels(form, a, utc.AddHours(2), scale)).Select(a => a.Id).ToList();
+            Check(missing.Count == 0, "Every unlocked narrow card paints both date and time at scale " + scale + " (" + String.Join(", ", missing) + ")");
+        }
+        using (var bitmap = new Bitmap(340, 132))
+        using (var g = Graphics.FromImage(bitmap))
+        {
+            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+            var dateFont = Theme.Font(12.5f, Weight.Bold);
+            float dateWidth = Theme.Measure(g, "28/09/2026 23:58", dateFont).Width;
+            Check(rules.All(a => ((RectangleF)Call(form, "FooterRect", new RectangleF(0, 0, 340, 132), a)).Width - 24 >= dateWidth),
+                "Full numeric date, year and time fit beside the check and every catalog point value");
+        }
+        object oldProgress = Get(form, "progress");
+        var saved = new ProgressStore(Path.Combine(output, "unlock-dates"), "test", "synthetic");
+        saved.AwardMany(rules.Take(12).Select(a => a.Id), utc);
+        Set(form, "progress", saved); Call(form, "ClearTileImages");
+        form.SavePreview(Path.Combine(output, "unlock-dates.png"));
+        Set(form, "progress", oldProgress); Call(form, "ClearTileImages");
+    }
     static void MotionChecks(MainForm form, string output)
     {
         bool before = Motion.Reduced;
@@ -558,6 +600,8 @@ class UiTests
                 // This executable is built in an isolated test directory. It never attaches to Cemu.
                 Set(form, "soundOn", false); Set(form, "ambientOn", false);
                 form.Show(); form.Location = new Point(-20000, -20000); Settle();
+                UnlockDateChecks(form, output);
+                if (args.Contains("--unlock-dates-only")) { Console.WriteLine("Unlock dates: " + checks + " UI checks passed."); return 0; }
                 PartialPaintChecks(form, output);
                 CloudChecks(form, output);
                 AutomaticWaitingChecks(form, output);

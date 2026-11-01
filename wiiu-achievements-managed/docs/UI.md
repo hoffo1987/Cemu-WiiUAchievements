@@ -84,13 +84,18 @@ checks that every title and description fits whole at that width.
 
 | State | Badge on the medal | Chip | Outline / medal |
 | --- | --- | --- | --- |
-| Sbloccato | green check | "Sbloccato" + date | rarity border and wash, full colour; gold/platinum wear the gold corners |
+| Sbloccato | green check | check + full numeric local date and time | rarity border and wash, full colour; gold/platinum wear the gold corners |
 | Da sbloccare | grey lock | "Da sbloccare" | plain border, muted medal |
 | Sperimentale | amber flask | "Sperimentale · da ottenere" | plain border, muted medal |
 | Non attivo | violet hourglass | "Non attivo · da verificare" | dashed border, translucent card, washed medal, dashed "?" points |
 
+Unlocked cards reserve the footer for a check and `dd/MM/yyyy HH:mm`; the
+detail view retains the full "Sbloccato" chip and long date. The previous chip
+could suppress an entire saved timestamp on narrow cards. This layout applies
+to existing and future awards without changing stored UTC dates.
+
 States therefore read by icon, word and shape, not by colour alone. Secondary
-words are shown only when they fit whole. While connected, the chip is replaced
+words for locked/planned states are shown only when they fit whole. While connected, the chip is replaced
 by the live progress bar or the confirmation phase. The empty state is a
 centred block (search or trophy illustration, message, "Mostra tutti gli
 obiettivi").

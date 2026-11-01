@@ -1,5 +1,35 @@
 # Validation record and reproduction
 
+## Missing unlock dates on narrow cards — 2026-11-01, Windows x64
+
+Reported: only "Bottino da pirata" displayed a timestamp among earned medals.
+The card renderer intentionally discarded the entire secondary text if it did
+not fit after the "Sbloccato" chip, with points reducing the available width.
+The store still requires and persists a UTC timestamp for every award.
+Unlocked card footers now draw a compact check and full `dd/MM/yyyy HH:mm`
+local date in reserved space. Detail dates, engine, persistence, IDs and
+revision are unchanged; existing saved timestamps need no repair or migration.
+
+Checks actually performed:
+
+- Reproduced invisible timestamps before the fix with a pixel regression on
+  every one of the 110 executable rules at minimum card width (340 px).
+- New rendering checks change the date and hour independently for every rule
+  at 100/125/150/200% scale; all four pass after the fix. A fifth check confirms
+  the full numeric year/date/time fits beside the check and all catalog point
+  values. The isolated `UiTests.exe <output> --unlock-dates-only` runs these five.
+- Inspected the synthetic 1120x840 preview with twelve stored awards: dates
+  and times are visible on the three-column grid, including the pirate medal.
+- Full standalone UI suite passed 149 checks (145 existing + four pixel
+  regressions); the final targeted run passed all five new date checks,
+  including the subsequently added full-text fit assertion.
+- 214 native feed + 16 native UI checks passed; shared C# 5/x64 build passed.
+- Root EXE rebuilt; after the owner closed Cemu, installed the identical managed
+  EXE into `build-check/cemu-integrated/WiiUAchievements/` and verified SHA-256.
+  Cemu itself and personal state were not modified. No ZIP/publication.
+
+No new real-game award or reopened live Cemu panel was tested for this UI fix.
+
 ## All 40 remaining catalog objectives — 2026-11-01, Windows x64
 
 110 executable objectives, 93 explicitly experimental, zero planned WWHD

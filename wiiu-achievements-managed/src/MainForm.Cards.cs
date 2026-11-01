@@ -323,6 +323,16 @@ namespace WiiUAchievements
         {
             var style = Style;
             var font = Theme.Font(centered ? 13.5f : 12.5f, Weight.Bold);
+            // An earned timestamp is primary information. The full state chip used to
+            // consume the narrow card's footer and silently suppress the whole date.
+            // Keep the check and reserve the remaining row for a complete numeric date.
+            if (!centered && unlock != null && !a.IsPlanned)
+            {
+                Theme.Check(g, new RectangleF(r.X + 1, r.Y + (r.Height - 16) / 2, 16, 16), Theme.UnlockedInk, 1.8f);
+                Theme.Text(g, unlock.Utc.ToLocalTime().ToString("dd/MM/yyyy HH:mm", Italian), font, style.Muted,
+                    new RectangleF(r.X + 24, r.Y, r.Width - 24, r.Height), StringAlignment.Near, StringAlignment.Center, false);
+                return;
+            }
             var chipFont = Theme.Font(centered ? 13 : 12, Weight.Heavy);
             float chipH = centered ? 26 : 22;
             CardState chip = StateOf(a, unlock);
