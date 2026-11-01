@@ -11,9 +11,11 @@ Earlier 70/53/40 counts below are historical and superseded.
 catalog/artwork audit pass. The 302-file source-only package rebuild passes.
 The root EXE and the local integrated fork's managed module have been updated
 while both apps were closed. No ZIP or personal-state migration was created.
-The fork overlay is prepared locally. Publishing this new expansion to GitHub
-and starting clean-runner CI requires explicit user approval: automatic review
-rejected that export before execution. Local builds/tests are unaffected.
+The user explicitly approved publishing the fork and running CI after the
+initial automatic-review rejection. Source commit `a7b03d0` is published on
+`codex/wiiu-achievements`; CI run `41256997922` passed the real C++/CLR host
+smoke and 214 feed + 16 native UI checks on a clean Windows runner. The full
+Cemu EXE is unchanged; the local managed module and XML are current.
 
 **Cemu integration attempt (2026-10-31):** the owner requested a fork with
 in-process achievements. `integrations/cemu/` contains the pinned v2.6 native

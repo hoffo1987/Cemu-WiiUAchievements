@@ -47,11 +47,17 @@ in the real game for this expansion. The owner has only the current save.
 Static parameters and synthetic tests do not certify live EUR behavior.
 Maggie/trading completion inferences, stage-save timing and the final scene's
 valid-player observation window remain particularly important live checks.
-The native C++ host was not changed or rebuilt for these managed conditions.
+The native C++ host production code and full Cemu executable are unchanged.
 The attempted GitHub push and CI dispatch were rejected by automatic approval
 review before execution because this new source export lacked explicit user
-authorization. No new remote CI result or downloadable full-Cemu artifact is
-claimed. The local fork source overlay and both local modules are updated.
+authorization. The user then explicitly approved this fork push and CI.
+Published source commit `a7b03d0a9fcb6241da2b88512e8b310cd4af98b6` passed
+[CI run 41256997922](https://github.com/hoffo1987/Cemu-WiiUAchievements/actions/runs/41256997922):
+the real C++ host was rebuilt into its isolated harness, loaded the managed
+module through CLR v4 and passed synthetic engine/persistence smoke checks;
+214 feed + 16 native UI checks passed on the clean Windows runner too.
+This was `validation_only=true`: no new downloadable full-Cemu artifact was
+built. The local fork source overlay and both local modules are updated.
 
 ## Stuck "Attesa automatica" after a Piece of Heart — 2026-11-01, Windows x64, live Cemu fork
 

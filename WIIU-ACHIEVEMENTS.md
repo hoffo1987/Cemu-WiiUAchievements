@@ -15,6 +15,11 @@ planned targets share their implementation with the standalone app. This fork
 does not certify the whole game set. Sources and limits are in
 [the expansion ledger](wiiu-achievements-managed/docs/DETECTOR-EXPANSION.md).
 Native snapshots follow submitted game frames, with menu/load/lifecycle guards.
+The 40-objective expansion passed the real C++/CLR host and managed adapter
+checks in [Windows CI run 41256997922](https://github.com/hoffo1987/Cemu-WiiUAchievements/actions/runs/41256997922)
+at source commit `a7b03d0`. This validation-only run did not republish the full
+Cemu artifact: update its managed module from the current source or build the
+complete workflow to obtain an artifact containing the expanded catalog.
 Full Cemu/native and real gameplay validation status is in
 [the guide](wiiu-achievements-managed/docs/CEMU-INTEGRATION.md) and
 [validation record](wiiu-achievements-managed/docs/VALIDATION.md).
