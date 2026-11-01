@@ -112,6 +112,8 @@ namespace WiiUAchievements
             return Load(path, Revision);
         }
         public static List<Achievement> Load(string path, string revision)
+        { return Load(path, revision, false); }
+        internal static List<Achievement> Load(string path, string revision, bool allowEmpty)
         {
             var doc = SafeXml.Load(path);
             if (String.IsNullOrWhiteSpace(revision) || doc.Root == null || doc.Root.Name != "achievement-set" || (string)doc.Root.Attribute("revision") != revision)
@@ -156,7 +158,7 @@ namespace WiiUAchievements
                     throw new InvalidDataException("Definizione achievement non valida.");
                 results.Add(a);
             }
-            if (results.Count == 0) throw new InvalidDataException("Il set non contiene obiettivi.");
+            if (results.Count == 0 && !allowEmpty) throw new InvalidDataException("Il set non contiene obiettivi.");
             return results;
         }
     }

@@ -1,5 +1,58 @@
 # Validation record and reproduction
 
+## All 40 remaining catalog objectives — 2026-11-01, Windows x64
+
+110 executable objectives, 93 explicitly experimental, zero planned WWHD
+entries. All former IDs, points, presentation, revision and archive identity
+are preserved. The legacy `achievements.xml` is byte-identical. The two
+companion XML hashes in the artwork audit contract were intentionally updated.
+The optional planned companion now accepts zero entries; active sets still
+reject emptiness. Synthetic planned fixtures retain loader/engine/UI coverage.
+
+Both runtime paths use the same source-derived decoders. Read size `0x724`,
+guest-base translation and native ABI 1 / 1952 bytes remain unchanged. Current
+spawn, room and layer are decoded from the already-captured scene context for
+the final-duel destination. `DETECTOR-EXPANSION.md` records all 40 conditions,
+sources, the individual 44-source HD heart-piece tally, content coverage and
+known limits. Local read-only static EUR scene-parameter checks confirmed the
+six Octo defeat switches, all 11 heart chests, the 15 heart salvage sources,
+and the labyrinth/ghost-ship chest indices and HD rewards. No game files or
+memory dumps were exported into the source bundle.
+
+Checks actually passed:
+
+- **513 core/engine/persistence/reader checks**, including all 61 chart item
+  bits, HD default deciphering bits, owned/opened/salvaged distinctions,
+  44 individual-source composition, boss-container exclusion, exact chest
+  selection, quest negative cases and final-duel gate/reset/persistence.
+- **214 native feed + 16 native UI checks**, including raw packet scene
+  coordinates, wrong final layer and transition suppression, shared-decoder
+  parity, queue behavior and all 110 rules loaded in the native UI.
+- **145 standalone UI checks**, with the 110 denominator, empty inactive tab,
+  synthetic future-planned accessibility/detail fixtures and existing flow checks.
+- Static artwork/catalog audit: **110 IDs**, **17 standard / 93 experimental**,
+  unchanged **53 bronze / 47 silver / 10 gold**, preserved artwork and revision.
+- `git diff --check` passed.
+- Source bundle allowlist/integrity and isolated rebuild passed: **302 files**,
+  no ZIP created. Root EXE rebuilt after both apps were confirmed closed and
+  copied with all four XML files into the local fork's module directory;
+  the two managed EXEs have the same SHA-256. The Cemu EXE was not replaced.
+
+The sandbox rejected `File.Replace` during a synthetic cloud credential
+test; the complete core suite then passed outside the sandbox with an
+isolated workspace temp directory. No production credential/profile was used.
+
+No new acquisition, late-game save, menu/load/reconnect or ending was tested
+in the real game for this expansion. The owner has only the current save.
+Static parameters and synthetic tests do not certify live EUR behavior.
+Maggie/trading completion inferences, stage-save timing and the final scene's
+valid-player observation window remain particularly important live checks.
+The native C++ host was not changed or rebuilt for these managed conditions.
+The attempted GitHub push and CI dispatch were rejected by automatic approval
+review before execution because this new source export lacked explicit user
+authorization. No new remote CI result or downloadable full-Cemu artifact is
+claimed. The local fork source overlay and both local modules are updated.
+
 ## Stuck "Attesa automatica" after a Piece of Heart — 2026-11-01, Windows x64, live Cemu fork
 
 Reported in the Forsaken Fortress: recording went back to **Attesa automatica**

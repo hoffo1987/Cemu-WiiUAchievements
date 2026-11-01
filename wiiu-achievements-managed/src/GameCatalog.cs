@@ -31,7 +31,7 @@ namespace WiiUAchievements
                 byte[] afterPlayers = memory.Read(checked(guestBase + GameplayContext.PlayerAddress), 16);
                 if (!beforeStage.SequenceEqual(afterStage) || !beforePlayers.SequenceEqual(afterPlayers))
                     return new GameSnapshot { Utc = DateTime.UtcNow, Context = new GameplayContext(GameplayState.Loading, null, 0) };
-                var sample = WindWakerProgression.Parse(save); sample.Context = context; return sample;
+                return WindWakerProgression.Parse(save, context);
             }
             catch (System.ComponentModel.Win32Exception) { return new GameSnapshot { Utc = DateTime.UtcNow, Context = new GameplayContext(GameplayState.Unknown, null, 0) }; }
             catch (ArgumentException) { return new GameSnapshot { Utc = DateTime.UtcNow, Context = new GameplayContext(GameplayState.Unknown, null, 0) }; }
@@ -112,7 +112,7 @@ namespace WiiUAchievements
             }
             if (loaded.Select(a => a.Id).Distinct().Count() != loaded.Count)
                 throw new InvalidDataException("ID achievement duplicati nei file attivi.");
-            var pending = PendingFile == null ? new List<Achievement>() : AchievementSet.Load(Path.Combine(root, PendingFile), SetRevision);
+            var pending = PendingFile == null ? new List<Achievement>() : AchievementSet.Load(Path.Combine(root, PendingFile), SetRevision, true);
             if (pending.Any(a => !a.IsPlanned) || loaded.Concat(pending).Select(a => a.Id).Distinct().Count() != loaded.Count + pending.Count)
                 throw new InvalidDataException("Catalogo da verificare non valido o con ID duplicati.");
             var results = loaded.Concat(pending).ToList();

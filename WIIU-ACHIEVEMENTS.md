@@ -10,8 +10,10 @@ The separate Wii U Achievements app must be closed to avoid concurrent archive
 writers. No EmuHook or game-memory writes are used.
 
 Supported game: The Wind Waker HD EUR v0, Title ID `0005000010143600`, RPX
-`cdc68acd`. The catalog remains 70 executable objectives (53 experimental) and
-40 unimplemented targets. This fork does not certify the whole game set.
+`cdc68acd`. All 110 catalog objectives execute (93 experimental); the 40 formerly
+planned targets share their implementation with the standalone app. This fork
+does not certify the whole game set. Sources and limits are in
+[the expansion ledger](wiiu-achievements-managed/docs/DETECTOR-EXPANSION.md).
 Native snapshots follow submitted game frames, with menu/load/lifecycle guards.
 Full Cemu/native and real gameplay validation status is in
 [the guide](wiiu-achievements-managed/docs/CEMU-INTEGRATION.md) and

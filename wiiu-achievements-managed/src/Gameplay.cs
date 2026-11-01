@@ -12,8 +12,14 @@ namespace WiiUAchievements
         public string Stage { get; private set; }
         public uint Player { get; private set; }
         public bool RequestedTransition { get; private set; }
+        public int StartPoint { get; private set; }
+        public int Room { get; private set; }
+        public int Layer { get; private set; }
         public string Key { get { return Stage + ":" + Player.ToString("X8"); } }
-        public GameplayContext(GameplayState state, string stage, uint player, bool requestedTransition = false) { State = state; Stage = stage; Player = player; RequestedTransition = requestedTransition; }
+        public GameplayContext(GameplayState state, string stage, uint player, bool requestedTransition = false,
+            int startPoint = -1, int room = -1, int layer = -1)
+        { State = state; Stage = stage; Player = player; RequestedTransition = requestedTransition;
+            StartPoint = startPoint; Room = room; Layer = layer; }
         static string Name(byte[] bytes, int offset)
         {
             int length = 0; while (length < 8 && bytes[offset + length] != 0) length++;
@@ -31,7 +37,8 @@ namespace WiiUAchievements
             if (name == "Name" || name == "sea_T") return new GameplayContext(GameplayState.Menu, name, player);
             if (stage[24] != 0 || player == 0 || second == 0) return new GameplayContext(GameplayState.Loading, name, player, stage[24] == 1 && next != "Name" && next != "sea_T");
             if (player != second || player < 0x10000000 || player >= 0x50000000 || (player & 3) != 0) return new GameplayContext(GameplayState.Unknown, name, player);
-            return new GameplayContext(GameplayState.Ready, name, player);
+            return new GameplayContext(GameplayState.Ready, name, player, false,
+                (short)((stage[8] << 8) | stage[9]), (sbyte)stage[10], (sbyte)stage[11]);
         }
     }
     public sealed class GameplayGate

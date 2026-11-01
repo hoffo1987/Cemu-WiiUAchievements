@@ -66,8 +66,9 @@ factories. Its collections are immutable. `MainForm` keeps the selected game and
 loads that game’s rules before changing selection. See `GAMES.md`.
 
 `GameSnapshot` parses the six-byte big-endian header and provides named fields
-to rules. `Observation.Validate` enforces 12–80 quarter-heart capacity, capacity
-divisible by four, current health between zero and capacity, and 0–5000 rupees.
+to rules. `Observation.Validate` enforces 12–80 quarter-heart capacity,
+including partial heart-piece capacities, current health between zero and
+capacity, and 0–5000 rupees.
 Those assumptions are part of the current profile; review them before extending
 the game or supporting other titles.
 

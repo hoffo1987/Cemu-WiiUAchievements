@@ -46,7 +46,7 @@ class NativeCemuUiTests
                 Check((bool)Get(form, "nativeListening") && (bool)Get(form, "recording"), "native session automatically listens without process access");
                 Check(Get(form, "memory") == null && Get(form, "gameReader") == null, "native adapter never opens a process reader");
                 Check(((List<Achievement>)Get(form, "rules")).Count == 110, "native window loads the unchanged 110-objective catalog");
-                Check(((List<Achievement>)Get(form, "rules")).Count(a => !a.IsPlanned) == 70, "only the existing 70 rules can execute");
+                Check(((List<Achievement>)Get(form, "rules")).Count(a => !a.IsPlanned) == 110, "the native UI loads all 110 shared executable rules");
                 var store = (ProgressStore)Get(form, "progress");
                 for (ulong i = 0; i < 13; i++)
                 {

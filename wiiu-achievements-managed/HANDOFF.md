@@ -1,12 +1,27 @@
 # Current documentation entry point
 
+**All remaining catalog detectors (2026-11-01):** all 40 formerly planned IDs
+now have shared executable conditions: 110 active, 93 experimental, zero
+unimplemented catalog targets. Read `docs/DETECTOR-EXPANSION.md` for sources,
+the 44 distinct HD heart-piece sources, final-duel context, coverage and known
+inferences. The owner has only the current save; no new late-game live
+certification is claimed. IDs/revision/progress and native protocol are unchanged.
+Earlier 70/53/40 counts below are historical and superseded.
+513 core, 214 feed + 16 native UI, 145 standalone UI checks and the 110-ID
+catalog/artwork audit pass. The 302-file source-only package rebuild passes.
+The root EXE and the local integrated fork's managed module have been updated
+while both apps were closed. No ZIP or personal-state migration was created.
+The fork overlay is prepared locally. Publishing this new expansion to GitHub
+and starting clean-runner CI requires explicit user approval: automatic review
+rejected that export before execution. Local builds/tests are unaffected.
+
 **Cemu integration attempt (2026-10-31):** the owner requested a fork with
 in-process achievements. `integrations/cemu/` contains the pinned v2.6 native
 CLR host, lifecycle/frame/menu patch and reproducible Windows build workflow.
 `src/NativeCemuBridge.cs` and `MainForm.Native.cs` reuse the existing C# engine,
 UI, archive and cloud client inside Cemu. See `docs/CEMU-INTEGRATION.md` and
 the latest validation record. This does not certify the experimental detectors
-or implement the remaining 40 targets. Keep the Desktop emulator separate until
+or by itself validate the experimental targets. Keep the Desktop emulator separate until
 native build and live validation are complete.
 
 The Windows native build now passes (CI run `41240085236`). The usable local

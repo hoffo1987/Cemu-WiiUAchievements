@@ -1,9 +1,12 @@
 # Percorso giocabile — build sperimentale
 
-Questa build implementa **53 nuovi rilevamenti automatici**: sono eseguibili e
+Questa build comprende **93 rilevamenti sperimentali**, inclusi i 40 obiettivi
+implementati il 1 novembre 2026: sono eseguibili e
 possono assegnare sblocchi e punti, ma devono ancora essere confermati durante
-una partita reale. Il catalogo comprende **70 obiettivi attivi**, di cui 53
-sperimentali, e **40 non implementati**. Non è una certificazione del set completo.
+una partita reale. Il catalogo comprende **110 obiettivi attivi**, di cui 93
+sperimentali, e nessun obiettivo non implementato. Fonti e limiti delle nuove
+condizioni sono in [DETECTOR-EXPANSION](DETECTOR-EXPANSION.md).
+Non è una certificazione del set completo.
 La tunica mantiene lo stesso ID e lo sblocco già guadagnato.
 
 ## Come usarla durante la partita
@@ -23,7 +26,7 @@ attivo**, invece, non hanno ancora una condizione e non possono sbloccarsi.
 Collegati sulla partita caricata e attendi la stabilizzazione. La produzione
 riconosce anche le condizioni già soddisfatte dopo il controllo del contesto
 di gioco e tre conferme coerenti. Le condizioni sperimentali mantengono i loro
-limiti di verifica; i 40 bersagli non attivi non vengono assegnati. Gli sblocchi
+limiti di verifica; nessun traguardo WWHD è rimasto non attivo. Gli sblocchi
 già registrati conservano le loro date.
 Puoi lasciare l'app collegata durante i caricamenti: mostra **Attesa automatica**,
 poi riprende dopo la stabilizzazione. Pausa/Scollega restano facoltativi nei
@@ -45,7 +48,7 @@ flussi verificati. Evidenze e casi ancora da verificare: [caricamenti automatici
 | 10 — Terra | Frecce elementali, bracciali, stivali di ferro, melodia della terra, scudo specchio; Jalhalla insieme al ripristino della spada |
 | 11 — Vento | Melodia del vento del tempio, arpione; Molgera insieme al pieno potere della spada |
 | 12 — Triforza | Primo frammento; tutti gli otto frammenti |
-| 13 — Finale | Barriera abbattuta; frecce di luce |
+| 13 — Finale | Barriera abbattuta; frecce di luce; Puppet Ganon; transizione finale dopo Ganondorf |
 | 14 — Extra liberi | Vela veloce, armatura magica, magia doppia, capacità bombe/frecce 99, portafoglio 5000, canzone del giorno/notte, sei melodie, quattro bottiglie, carta nautica 10/25/49 settori |
 | 15 — Crescita | Le 16 soglie già presenti su rupie e capacità dei cuori |
 
@@ -55,12 +58,15 @@ usando il portale: una notifica può quindi arrivare dopo il combattimento.
 Le perle di Din/Farore e i ripristini della spada sono condizioni aggiuntive,
 senza modificare il significato degli ID esistenti.
 
-## Cosa resta fuori da questa build
+## I 40 rilevamenti aggiunti e i limiti
 
-Rimangono non attivi 40 traguardi, fra cui minigiochi, fotografie per la Galleria,
-singoli premi di missione, tesori sommersi, carte del tesoro, statue e alcuni
-eventi di storia/finale. Per questi manca ancora una mappatura sufficientemente
-precisa. Non vengono dedotti da rupie, cuori generici o dalla sola posizione.
+Sono ora eseguibili anche tutti i minigiochi e premi del catalogo, Galleria,
+tesori sommersi, carte, statue, frammenti di cuore e gli eventi di storia/finale
+prima mancanti. La tabella completa dei 40 ID e i limiti specifici sono in
+[DETECTOR-EXPANSION](DETECTOR-EXPANSION.md). Alcuni flag salvati si aggiornano
+dopo l'uscita dalla scena; Maggie/scambi usano inferenze ancora da verificare.
+Il finale di Ganondorf deve essere osservato mentre avviene: tenere aperta la
+registrazione durante il duello e la scena successiva.
 
 Se durante il gioco un evento implementato non si sblocca, bastano il nome
 dell'obiettivo, l'azione appena fatta e lo stato mostrato nella scheda/registro.

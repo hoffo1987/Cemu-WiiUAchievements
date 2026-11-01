@@ -6,8 +6,14 @@ Repository: <https://github.com/hoffo1987/Cemu-WiiUAchievements>, branch
 `codex/wiiu-achievements`.
 
 This implementation does not certify the whole achievement set. The catalog
-remains 70 executable objectives (53 experimental) and 40 unimplemented targets.
+now contains 110 executable objectives (93 experimental), with no unimplemented
+catalog targets. The 40-condition expansion is documented in `DETECTOR-EXPANSION.md`.
 No new memory mapping has been declared verified.
+The 2026-11-01 expansion is built and installed locally; a previously downloaded
+CI artifact can still contain the older managed catalog. The native host ABI is
+unchanged, so rebuilding `wiiu-achievements-managed/build.ps1` into the fork's
+`WiiUAchievements/` directory updates the module and XML without recompiling Cemu.
+Close Cemu before replacing that module.
 
 ## Running the development build
 

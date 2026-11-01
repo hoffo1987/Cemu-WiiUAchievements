@@ -19,8 +19,119 @@ static class ProgressionTests
         s.Utc = new DateTime(2026, 10, 28, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(100 * frame); return s;
     }
     static bool Rejects(Action action) { try { action(); return false; } catch (ArgumentException) { return true; } catch (InvalidDataException) { return true; } }
+    static void Word(byte[] b, int offset, int bit) { b[offset + 4 * (bit / 32) + 3 - bit % 32 / 8] |= (byte)(1 << (bit % 8)); }
+    static void Flag(byte[] b, int flag) { b[0x624 + (flag >> 8)] |= (byte)(flag & 255); }
+    static void Box(byte[] b, int stage, int bit) { Word(b, 0x380 + 0x24 * stage, bit); }
+    static void RemainingChecks(Action<bool, string> check, string root)
+    {
+        var b = Empty(); b[0x145] = 0xEA;
+        check(At(b, 0).Value("deciphered_triforce_charts") == 0, "The five HD default deciphering bits award no obtainable Triforce charts");
+        b[0xD7] = 0x15;
+        check(At(b, 0).Value("deciphered_triforce_charts") == 0, "Owning three Triforce charts does not imply deciphering");
+        b[0x145] = 255;
+        check(At(b, 0).Value("deciphered_triforce_charts") == 3 && At(b, 0).Value("treasure_charts") == 0, "The three deciphered Triforce charts stay outside the 46 treasure charts");
+        // Item IDs CC..FE, excluding the two special charts and the three
+        // Triforce charts; item function collectmapNN uses index FE-item.
+        int normal = 0;
+        for (int item = 0xC2; item <= 0xFE; item++)
+        {
+            b = Empty(); Word(b, 0xD4, 0xFE - item);
+            bool treasure = item >= 0xCC && item != 0xDB && item != 0xDC && item != 0xFA && item != 0xFC && item != 0xFE;
+            check(At(b, 0).Value("treasure_charts") == (treasure ? 1 : 0), "Chart item " + item.ToString("X2") + " selects its actual HD pack bit");
+            if (treasure) normal++;
+        }
+        check(normal == 46, "Exactly 46 normal HD chart items exist in the reconstructed dispatch range");
+        b = Empty(); for (int i = 0; i < 16; i++) b[0xD4 + i] = 255;
+        check(At(b, 0).Value("treasure_charts") == 46 && At(b, 0).Value("chart_salvages") == 0, "Owned and opened charts alone cannot award a salvaged treasure");
+        for (int i = 0; i < 16; i++) b[0xF4 + i] = 255;
+        check(At(b, 0).Value("chart_salvages") == 46, "Special, Triforce and unused completed-map bits cannot inflate the 46 salvages");
+        b = Empty(); b[0xF7] = 128;
+        check(At(b, 0).Value("chart_salvages") == 0, "A completed-map bit without its owned chart is not counted");
+        b[0xD7] = 128;
+        check(At(b, 0).Value("chart_salvages") == 1 && At(b, 0).Value("teacher_chart_45") == 0, "HD chart 46 is distinct from the teacher's chart 45");
+        b[0xD7] |= 64; check(At(b, 0).Value("teacher_chart_45") == 1, "Teacher reward uses item F8, collect-map 7");
+        b = Empty(); b[0xBF] = 7; check(At(b, 0).Value("tower_pearls_placed") == 0, "Possession of pearls does not raise the tower");
+        Flag(b, 0x14C0); check(At(b, 0).Value("tower_pearls_placed") == 0, "Two placed pearls cannot satisfy the tower milestone");
+        Flag(b, 0x1410); check(At(b, 0).Value("tower_pearls_placed") == 1, "All three placement flags satisfy the tower milestone");
+        b = Empty(); Flag(b, 0x2920);
+        check(At(b, 0).Value("medli_temple") == 1 && At(b, 0).Value("makar_temple") == 0, "The two sages have independent persistent events");
+        b = Empty(); Flag(b, 0x3401);
+        check(At(b, 0).Value("gallery_first") == 0 && At(b, 0).Value("gallery_complete") == 0, "Submitting a pictograph does not create or complete the gallery");
+        Flag(b, 0x3A01); check(At(b, 0).Value("gallery_first") == 1 && At(b, 0).Value("gallery_complete") == 0, "First completed figurine is separate from HD gallery completion");
+        Flag(b, 0x3D08); check(At(b, 0).Value("gallery_complete") == 1, "Gallery completion uses Carlov's HD completion event");
+        b = Empty(); Flag(b, 0x3B02); Flag(b, 0x4002);
+        check(At(b, 0).Value("puppet_ganon_defeated") == 0 && !At(b, 0).HasValue("ganondorf_defeated"), "Pre-battle cutscenes cannot stand in for either final victory");
+        Flag(b, 0x3F10); b[0xBE] = 255; b[0xB4] = 15;
+        Func<int, int, int, GameSnapshot> finale = (point, room, layer) => WindWakerProgression.Parse(b,
+            new GameplayContext(GameplayState.Ready, "GTower", 0x15000000, false, point, room, layer));
+        check(finale(2, 0, 8).Value("ganondorf_defeated") == 0 && finale(1, 0, 9).Value("ganondorf_defeated") == 0 && finale(2, 1, 9).Value("ganondorf_defeated") == 0,
+            "Tower, layer, spawn and room must identify the final-blow transition together");
+        check(finale(2, 0, 9).Value("ganondorf_defeated") == 1 && At(b, 0).Value("puppet_ganon_defeated") == 1, "The HD post-duel destination completes the finale independently of Puppet Ganon");
+        var finalRule = new Achievement { Id = "story-ganondorf", Title = "Finale", Description = "Finale", Field = "ganondorf_defeated", Threshold = 1, Points = 25, Experimental = true };
+        string finalPath = Path.Combine(root, "decoded-finale");
+        var finalStore = new ProgressStore(finalPath, "synthetic", "synthetic");
+        var finalEngine = new AchievementEngine(new List<Achievement> { finalRule }, finalStore, AchievementRecognition.IncludeExistingSave);
+        DateTime epoch = new DateTime(2026, 11, 1, 0, 0, 0, DateTimeKind.Utc);
+        for (int frame = 0; frame < 13; frame++) { var s = finale(2, 0, 8); s.Utc = epoch.AddMilliseconds(frame * 100); finalEngine.Update(s); }
+        check(!finalStore.Contains(finalRule.Id), "A stabilized pre-victory tower never awards the final achievement");
+        var loading = finale(2, 0, 9); loading.Utc = epoch.AddMilliseconds(1300);
+        loading.Context = new GameplayContext(GameplayState.Loading, "GTower", 0);
+        finalEngine.Update(loading); finalEngine.Reset();
+        int finalAwards = 0;
+        for (int frame = 14; frame < 32; frame++) { var s = finale(2, 0, 9); s.Utc = epoch.AddMilliseconds(frame * 100); finalAwards += finalEngine.Update(s).Count; }
+        var restoredFinal = new ProgressStore(finalPath, "synthetic", "synthetic");
+        check(finalAwards == 1 && restoredFinal.Contains(finalRule.Id) && restoredFinal.Get(finalRule.Id).Utc >= epoch.AddMilliseconds(2100),
+            "The decoded finale survives a transition reset, gameplay stabilization, confirmation and archive restart exactly once");
+        b = Empty(); Flag(b, 0x0102); check(At(b, 0).Value("forest_water_reward") == 0, "All trees watered cannot substitute for collecting their heart reward");
+        Flag(b, 0x2E20); check(At(b, 0).Value("forest_water_reward") == 1, "The forest-water reward needs its pickup flag");
+        b = Empty(); b[0x624 + 0x88] = 3;
+        check(At(b, 0).Value("ghost_ship_reward") == 0, "Ghost Ship progression without the exact chest is insufficient");
+        Box(b, 10, 23); check(At(b, 0).Value("ghost_ship_reward") == 1, "The cleared Ghost Ship and chest 23 jointly identify its reward");
+        b = Empty(); Box(b, 13, 11);
+        check(At(b, 0).Value("savage_30") == 1 && At(b, 0).Value("savage_50") == 0, "The two Savage Labyrinth rewards use different chests");
+        Box(b, 13, 12); b[0xB7] = 1;
+        check(At(b, 0).Value("savage_50") == 0, "The Pirate's Charm cannot substitute for the HD Hero's Charm");
+        b[0xB8] = 1; check(At(b, 0).Value("savage_50") == 1, "Floor 50 requires its chest and Hero's Charm");
+        b = Empty(); for (int i = 3; i < 7; i++) Box(b, i, 15);
+        check(At(b, 0).Value("tingle_statues") == 4, "Four different Tingle chests do not complete the five-statue set");
+        Box(b, 7, 15); check(At(b, 0).Value("tingle_statues") == 5, "All five HD statue chests count exactly once");
+        b = Empty(); Word(b, 0x384, 52); b[0x5C0 + 6 * 2 + 1] = 1;
+        check(At(b, 0).Value("big_octos") == 0, "The fairy reward and salvaged Octo loot cannot substitute for a defeated Octo");
+        for (int bit = 13; bit <= 18; bit++) Word(b, 0x384, bit);
+        check(At(b, 0).Value("big_octos") == 6, "All six actual EUR Octo defeat switches count independently");
+        b = Empty(); b[0x624 + 0xBE] = 20; Flag(b, 0x0E04);
+        check(At(b, 0).Value("squid_20_reward") == 0, "A Squid-Hunt record without chart 23 does not count the prize");
+        b[0xD6] = 0x20; check(At(b, 0).Value("squid_20_reward") == 1, "A winning 20-shot record plus the correct prize completes Squid-Hunt");
+        b[0x624 + 0xBE] = 21; check(At(b, 0).Value("squid_20_reward") == 0, "A 21-shot record cannot complete the at-most-20 objective");
+        b = Empty(); b[0x92] = 0x80; b[0x86] = 0x9B;
+        check(At(b, 0).Value("maggie_reward") == 0, "Possessing Moe's letter is not delivering it");
+        b[0x86] = 255; b[0x624 + 0xCC] = 1;
+        check(At(b, 0).Value("maggie_reward") == 0, "An unfinished Maggie reward event cannot satisfy delivery");
+        b[0x624 + 0xCC] = 0; check(At(b, 0).Value("maggie_reward") == 1, "Maggie's persistent letter ownership, consumed letter and ended counter identify completion");
+        b = Empty(); Flag(b, 0xAE01); check(At(b, 0).Value("hoskit_letter_read") == 0, "Sending Hoskit's reward letter is distinct from reading it");
+        Flag(b, 0xAE02); check(At(b, 0).Value("hoskit_letter_read") == 1, "Hoskit completion requires the READ letter state");
+        b = Empty(); b[1] = 80; for (int i = 2; i <= 7; i++) b[0x380 + i * 0x24 + 0x21] = 24;
+        check(At(b, 0).Value("heart_pieces") == 0, "Twenty hearts and six boss containers alone cannot invent even one specific heart piece");
+        Box(b, 13, 12); b[0xB8] = 1;
+        check(At(b, 0).Value("heart_pieces") == 0, "The HD floor-50 charm is excluded from the heart-piece catalog");
+        b = Empty(); Flag(b, 0x1340);
+        check(!At(b, 0).HasValue("heart_pieces"), "A reward flag before its health animation leaves the piece count unavailable");
+        b[1] = 13; check(At(b, 0).Value("heart_pieces") == 1, "The first specific piece becomes available after its health gain");
+        b = Empty(); b[1] = 80;
+        int[,] boxes = { {0,10}, {0,6}, {2,3}, {0,3}, {0,0}, {0,20}, {12,26}, {12,5}, {12,6}, {10,1}, {10,0} };
+        for (int i = 0; i < boxes.GetLength(0); i++) Box(b, boxes[i,0], boxes[i,1]);
+        Word(b, 0x394, 2); Word(b, 0x394, 8);
+        foreach (int room in new[] {6,16,17}) b[0x5C0 + room * 2 + 1] = 1;
+        foreach (int chart in new[] {9,11,17,18,13,12,14,30,15,8,10,16}) { Word(b, 0xD4, chart - 1); Word(b, 0xF4, chart - 1); }
+        check(At(b, 0).Value("heart_pieces") == 28, "HD has 28 distinct field/chest/salvage heart pieces including the new sea-room-46 salvage");
+        foreach (int flag in new[] {0x0F10,0x1340,0x1B20,0x1020,0x1B10,0x2280,0xAE03,0xAC03,0xB503,0x3E04,0x2E20,0x2010,0x2B40}) Flag(b, flag);
+        b[0x624 + 0xFE] = 1; b[0x624 + 0xB7] = 1; b[0x92] = 0x80;
+        check(At(b, 0).Value("heart_pieces") == 44, "The 16 distinct NPC/minigame/mail rewards complete exactly 44 HD heart-piece sources");
+        b[0x624 + 0xFE] = 7; check(!At(b, 0).HasValue("heart_pieces"), "Invalid prize counters suppress the composite piece count");
+    }
     public static void Run(Action<bool, string> check, string root)
     {
+        RemainingChecks(check, root);
         var b = Empty();
         check(At(b, 0).Value("telescope") == 0 && At(b, 0).Value("bottle_count") == 0, "A reconstructed initial save decodes known absence separately from unavailable data");
         b[0x51] = 5; b[0xB4] = 15; b[0xB5] = 3;

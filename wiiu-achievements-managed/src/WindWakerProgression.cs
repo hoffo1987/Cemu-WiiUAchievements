@@ -28,13 +28,95 @@ namespace WiiUAchievements
         { return Bit(name, 0x624 + index, mask, 255); }
         static bool Boss(byte[] b, int stage) { return (b[0x380 + stage * 0x24 + 0x21] & 8) != 0; }
         static bool ValidBoss(byte[] b, int stage) { return (b[0x380 + stage * 0x24 + 0x21] & 0xC0) == 0; }
+        static bool Chest(byte[] b, int stage, int bit)
+        { return (b[0x380 + stage * 0x24 + 3 - bit / 8] & (1 << (bit % 8))) != 0; }
+        static bool WordBit(byte[] b, int offset, int bit)
+        { return (b[offset + bit / 32 * 4 + 3 - bit % 32 / 8] & (1 << (bit % 8))) != 0; }
+        static bool EventBit(byte[] b, int flag) { return (b[0x624 + (flag >> 8)] & (flag & 255)) == (flag & 255); }
+        static bool MaggieReward(byte[] b)
+        { return (b[0x92] & 0x80) != 0 && !b.Skip(0x86).Take(8).Any(v => v == 0x9B) && b[0x624 + 0xCC] == 0; }
+        // Individual HD sources, not max life minus a guessed number of bosses.
+        // The GC floor-50 heart is absent; HD adds the sea-room-46 salvage.
+        static readonly int[,] heartChests = { {0,10}, {0,6}, {2,3}, {0,3}, {0,0}, {0,20},
+            {12,26}, {12,5}, {12,6}, {10,1}, {10,0} };
+        static readonly int[] heartCharts = { 9, 11, 17, 18, 13, 12, 14, 30, 15, 8, 10, 16 };
+        static readonly int[] heartEvents = { 0x0F10, 0x1340, 0x1B20, 0x1020, 0x1B10, 0x2280,
+            0xAE03, 0xAC03, 0xB503, 0x3E04, 0x2E20, 0x2010, 0x2B40 };
+        static int? HeartPieces(byte[] b)
+        {
+            int squid = b[0x624 + 0xFE] & 7;
+            if (squid > 3) return null;
+            int count = heartEvents.Count(flag => EventBit(b, flag));
+            if (squid > 0) count++;
+            if ((b[0x624 + 0xB7] & 3) > 0) count++;
+            if (MaggieReward(b)) count++;
+            for (int i = 0; i < heartChests.GetLength(0); i++)
+                if (Chest(b, heartChests[i, 0], heartChests[i, 1])) count++;
+            if (WordBit(b, 0x394, 2)) count++;
+            if (WordBit(b, 0x394, 8)) count++;
+            foreach (int room in new[] { 6, 16, 17 }) if ((b[0x5C0 + room * 2 + 1] & 1) != 0) count++;
+            foreach (int chart in heartCharts)
+                if (WordBit(b, 0xF4, chart - 1) && WordBit(b, 0xD4, chart - 1)) count++;
+            int maxLife = (b[0] << 8) | b[1];
+            // Reward flags may precede the item demo. Never announce pieces
+            // before even their cumulative health gain could have been applied.
+            return count > 44 || count > maxLife - 12 ? (int?)null : count;
+        }
         static ProgressionField Dungeon(string name, int stage, int pearlMask, int swordMask)
         {
             return new ProgressionField(name, 1, b => !ValidBoss(b, stage) || (b[0xBF] & ~7) != 0 || (b[0xB4] & ~15) != 0 ? (int?)null :
                 Boss(b, stage) && (b[0xBF] & pearlMask) == pearlMask && (b[0xB4] & swordMask) == swordMask ? 1 : 0);
         }
         public static int PopCount(int bits) { int count = 0; for (; bits != 0; bits &= bits - 1) count++; return count; }
+        // HD chart packs, relative to the established save header. Special charts
+        // and Triforce charts are deliberately excluded (46 normal charts).
+        static readonly int[] treasureMasks = { 255, 255, 255, 0xEA, 0, 0x07, 255, 0xF3 };
+        static int ChartCount(byte[] b, bool salvaged)
+        {
+            int count = 0;
+            for (int i = 0; i < treasureMasks.Length; i++)
+                count += PopCount(b[0xD4 + i] & treasureMasks[i] & (salvaged ? b[0xF4 + i] : 255));
+            return count;
+        }
         static readonly ReadOnlyCollection<ProgressionField> fields = Array.AsReadOnly(new[] {
+            new ProgressionField("treasure_charts", 46, b => ChartCount(b, false)),
+            new ProgressionField("chart_salvages", 46, b => ChartCount(b, true)),
+            // HD initializes the other five deciphering bits to EA. Only
+            // 1/3/5 (bits 0/2/4) correspond to the three obtainable charts.
+            new ProgressionField("deciphered_triforce_charts", 3, b => PopCount(b[0x145] & b[0xD7] & 0x15)),
+            Event("tower_pearls_placed", 0x14, 0xD0),
+            Event("medli_temple", 0x29, 0x20), Event("makar_temple", 0x29, 0x10),
+            Event("gallery_first", 0x3A, 0x01),
+            Event("gallery_complete", 0x3D, 0x08),
+            Event("puppet_ganon_defeated", 0x3F, 0x10),
+            Event("hurricane_spin", 0x0B, 0x20), Event("orca_heart_reward", 0x0F, 0x10),
+            Event("cabana_deed", 0x1C, 0x08), Event("mila_reward", 0x0E, 0x08),
+            Event("killer_bees_reward", 0x13, 0x40), Event("town_decoration_reward", 0x1B, 0x10),
+            new ProgressionField("lighthouse_reward", 1, b => (b[0x624 + 0x1C] & 2) != 0 &&
+                (b[0x624 + 0x1B] & 0x20) != 0 ? 1 : 0),
+            new ProgressionField("maggie_reward", 1, b => MaggieReward(b) ? 1 : 0),
+            Event("trading_reward", 0x3E, 0x04), Event("hoskit_letter_read", 0xAE, 0x03),
+            new ProgressionField("ghost_ship_reward", 1, b => (b[0x624 + 0x88] & 3) == 3 && Chest(b, 10, 23) ? 1 : 0),
+            new ProgressionField("savage_30", 1, b => Chest(b, 13, 11) ? 1 : 0),
+            new ProgressionField("savage_50", 1, b => Chest(b, 13, 12) && (b[0xB8] & 1) != 0 ? 1 : 0),
+            new ProgressionField("tingle_statues", 5, b => Enumerable.Range(3, 5).Count(stage => Chest(b, stage, 15))),
+            // Six different sea switches, read from the local EUR actor parameters.
+            // The fairy's later switch 0x34 and ocean salvage bits do not count kills.
+            new ProgressionField("big_octos", 6, b => PopCount(b[0x386] & 0xE0) + PopCount(b[0x385] & 7)),
+            new ProgressionField("heart_pieces", 44, HeartPieces),
+            // Context-derived below: no save bit is invented for the final duel.
+            new ProgressionField("ganondorf_defeated", 1, b => null),
+            Event("flight_reward", 0x2B, 0x40),
+            new ProgressionField("mail_25", 1, b => (b[0x624 + 0xC2] & 3) == 3 ? 1 : 0),
+            new ProgressionField("squid_win", 1, b => (b[0x624 + 0xFE] & 7) >= 1 &&
+                (b[0x624 + 0xFE] & 7) <= 3 ? 1 : 0),
+            new ProgressionField("squid_20_reward", 1, b => (b[0x624 + 0x0E] & 4) != 0 &&
+                b[0x624 + 0xBE] >= 9 && b[0x624 + 0xBE] <= 20 && (b[0xD6] & 0x20) != 0 ? 1 : 0),
+            new ProgressionField("spectacle_win", 1, b => (b[0x624 + 0xB7] & 3) >= 1 ? 1 : 0),
+            new ProgressionField("forest_water_reward", 1, b => (b[0x624 + 1] & 2) != 0 &&
+                (b[0x624 + 0x2E] & 0x20) != 0 ? 1 : 0),
+            // In the unmodified HD game chart 45 is the teacher's final reward.
+            Bit("teacher_chart_45", 0xD7, 0x40, 255),
             Bit("telescope", 0x51, 1, 5), Bit("hero_sword", 0xB4, 1, 15), Bit("hero_shield", 0xB5, 1, 3),
             Bit("spoils_bag", 0x55, 1, 1), Event("met_korl", 0x0F, 0x80), Bit("sail", 0x52, 1, 3),
             Bit("wind_waker", 0x53, 1, 1), Bit("delivery_bag", 0x63, 1, 1), Bit("bait_bag", 0x5C, 1, 1),
@@ -78,12 +160,18 @@ namespace WiiUAchievements
             if (name == "wallet_capacity") return threshold == 500 || threshold == 1000 || threshold == 5000;
             return true;
         }
-        public static GameSnapshot Parse(byte[] bytes)
+        public static GameSnapshot Parse(byte[] bytes) { return Parse(bytes, null); }
+        public static GameSnapshot Parse(byte[] bytes, GameplayContext context)
         {
             if (bytes == null || bytes.Length < ReadSize) throw new System.IO.InvalidDataException("Blocco progressione incompleto.");
             var snapshot = GameSnapshot.Parse(bytes);
             snapshot.HeroClothes = (bytes[0x64E] & 0x80) != 0 ? 1 : 0;
             foreach (var field in fields) { var value = field.Decode(bytes); if (value.HasValue) snapshot.SetProgression(field.Name, value.Value); }
+            snapshot.Context = context;
+            if (context != null && context.State == GameplayState.Ready && context.Layer >= 0)
+                snapshot.SetProgression("ganondorf_defeated", context.Stage == "GTower" && context.StartPoint == 2 &&
+                    context.Room == 0 && context.Layer == 9 && EventBit(bytes, 0x3F10) && bytes[0xBE] == 255 &&
+                    (bytes[0xB4] & 15) == 15 ? 1 : 0);
             return snapshot;
         }
     }

@@ -142,13 +142,24 @@ public static class NativeCemuTests
         packet[82 + 0x64E] = 0xA0; packet[82 + 0x4A] = 0x54; packet[82 + 0x5D] = 7;
         packet[82 + 0x6F] = 99; packet[82 + 0x70] = 60; packet[82 + 0x13] = 32; packet[82 + 0x12] = 2;
         var save = new byte[WindWakerProgression.ReadSize]; Buffer.BlockCopy(packet, 82, save, 0, save.Length);
-        var expected = WindWakerProgression.Parse(save); sample = Decode(packet);
+        sample = Decode(packet); var expected = WindWakerProgression.Parse(save, sample.Snapshot.Context);
         Check(sample.Snapshot.HeroClothes == expected.HeroClothes && WindWakerProgression.Fields.All(f =>
             sample.Snapshot.HasValue(f.Name) == expected.HasValue(f.Name) && (!expected.HasValue(f.Name) || sample.Snapshot.Value(f.Name) == expected.Value(f.Name))),
-            "all 50 progression fields retain the production decoder's exact semantics");
+            "all progression fields and scene-derived completion retain the shared decoder's exact semantics");
         packet[82 + 0x5D] = 255; sample = Decode(packet);
         Check(!sample.Snapshot.HasValue("bow") && !sample.Snapshot.HasValue("elemental_arrows") && !sample.Snapshot.HasValue("light_arrows"),
             "unavailable progression does not turn into an award or a zero baseline");
+
+        packet = Packet(100); Scene(packet, 40, "GTower");
+        packet[49] = 2; packet[50] = 0; packet[51] = 9;
+        packet[82 + 0x624 + 0x3F] = 0x10; packet[82 + 0xBE] = 255; packet[82 + 0xB4] = 15;
+        Buffer.BlockCopy(packet, 40, packet, 1910, 42); sample = Decode(packet);
+        Check(sample.Snapshot.Context.StartPoint == 2 && sample.Snapshot.Context.Room == 0 && sample.Snapshot.Context.Layer == 9 &&
+            sample.Snapshot.Value("ganondorf_defeated") == 1, "native packets decode the actual post-duel destination without a new ABI");
+        packet[51] = 8; Buffer.BlockCopy(packet, 40, packet, 1910, 42);
+        Check(Decode(packet).Snapshot.Value("ganondorf_defeated") == 0, "the preceding native tower layer cannot award Ganondorf");
+        packet[51] = 9; packet[64] = 1; Buffer.BlockCopy(packet, 40, packet, 1910, 42);
+        Check(!Decode(packet).Snapshot.HasValue("ganondorf_defeated"), "a pending native transition cannot evaluate victory prematurely");
 
         feed = new NativeCemuFeed(); feed.Submit(Packet(100)); Read(feed);
         packet = Packet(200); Scene(packet, 40, "Name"); Buffer.BlockCopy(packet, 40, packet, 1910, 42);

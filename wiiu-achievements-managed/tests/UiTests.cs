@@ -236,13 +236,16 @@ class UiTests
         Check(((Achievement)Get(form, "detail")).Id == list[1].Id, "Right arrow shows the next objective in the current order");
         Click(form, "detail-prev");
         Check(((Achievement)Get(form, "detail")).Id == list[0].Id, "The side arrow returns to the previous objective");
-        var planned = list.First(a => a.IsPlanned);
+        var planned = list.Last(); planned.Requirement = "Synthetic missing evidence";
+        ((IDictionary)Get(form, "tileText")).Remove(planned); Call(form, "ClearTileImages");
         Set(form, "detail", planned); Settle();
         form.SavePreview(Path.Combine(output, "detail-planned.png"));
         Key(form, Keys.Escape); Settle();
         Check((float)Get(form, "dialogTarget") == 0, "Escape closes the detail card");
         var states = list.Select(a => Call(form, "StateOf", a, null).ToString()).Distinct().ToList();
-        Check(states.Contains("Locked") && states.Contains("Experimental") && states.Contains("Planned"), "Locked, experimental and planned objectives map to distinct card states");
+        Check(states.Contains("Locked") && states.Contains("Experimental") && Call(form, "StateOf", planned, null).ToString() == "Planned", "Locked, experimental and synthetic planned objectives map to distinct card states");
+        planned.Requirement = null; Set(form, "catalogKey", null);
+        ((IDictionary)Get(form, "tileText")).Remove(planned); Call(form, "ClearTileImages");
         var stateType = typeof(MainForm).GetNestedType("CardState", BindingFlags.NonPublic);
         var labels = new[] { "Unlocked", "Locked", "Experimental", "Planned" }.Select(n => (string)typeof(MainForm).GetMethod("StateLabel", BindingFlags.Static | BindingFlags.NonPublic)
             .Invoke(null, new[] { Enum.Parse(stateType, n) })).ToList();
@@ -570,12 +573,16 @@ class UiTests
                     Art.For(curated.Single(a => a.Id == "hearts-20"), curated).Tier == Tier.Gold,
                     "Medals use curated rarity independently of equal point values");
                 form.SavePreview(Path.Combine(output, "main.png"));
-                Check((int)form.GetType().GetProperty("ActiveCount", Private).GetValue(form, null) == 70,
+                Check((int)form.GetType().GetProperty("ActiveCount", Private).GetValue(form, null) == 110,
                     "Completion denominator contains only executable objectives");
                 Click(form, "tab3");
                 var pending = (List<Achievement>)Call(form, "Filtered");
-                Check(pending.Count == 40 && pending.All(a => a.IsPlanned),
-                    "Implemented series targets no longer appear in the unimplemented catalog");
+                Check(pending.Count == 0, "No implemented target remains in the unimplemented catalog");
+                // Future-game planned UI remains covered without shipping a disabled WWHD target.
+                var future = curated.Single(a => a.Id == "story-ganondorf");
+                future.Requirement = "Synthetic missing evidence"; Set(form, "catalogKey", null);
+                ((IDictionary)Get(form, "tileText")).Remove(future); Call(form, "ClearTileImages"); Call(form, "Arrange");
+                pending = (List<Achievement>)Call(form, "Filtered");
                 string pendingId = pending.First().Id;
                 Check(((string)Get(Widget(form, "tile:" + pendingId), "Help")).Contains("Da verificare"),
                     "Pending state and validation requirement reach accessibility clients");
@@ -585,7 +592,8 @@ class UiTests
                 Click(form, "tile:" + pendingId);
                 Check(((Achievement)Get(form, "detail")).Id == pendingId, "Pending objectives have an inspectable detail card");
                 form.SavePreview(Path.Combine(output, "pending-detail.png"));
-                Key(form, Keys.Escape); Click(form, "category");
+                Key(form, Keys.Escape); future.Requirement = null; Set(form, "catalogKey", null);
+                ((IDictionary)Get(form, "tileText")).Remove(future); Call(form, "ClearTileImages"); Click(form, "category");
                 Check((string)Get(form, "menu") == "category" && (int)form.GetType().GetProperty("ActiveLayer", Private).GetValue(form, null) == 3,
                     "The category button opens its menu as a separate input layer");
                 Call(form, "Arrange");

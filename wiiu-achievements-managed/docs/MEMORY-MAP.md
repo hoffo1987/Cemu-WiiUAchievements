@@ -1,5 +1,13 @@
 # Memory profile — EUR v0 only
 
+**2026-11-01 expansion:** `DETECTOR-EXPANSION.md` records the additional chart,
+quest, chest/switch, 44-source heart-piece and final-duel mappings. All 40
+promoted objectives remain experimental. Read size and guest addresses below
+are unchanged; the already-captured current-stage bytes +8/+A/+B now also
+decode start point, room and layer. These additional semantics have no new
+EUR live certification. Older 50-field and disabled-target statements below
+describe their dated baseline, not the current catalog.
+
 ## Address model
 
 Cemu 2.6 reserves a contiguous 4 GiB host virtual-address range for the Wii U

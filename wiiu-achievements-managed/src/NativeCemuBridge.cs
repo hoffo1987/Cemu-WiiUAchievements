@@ -150,7 +150,7 @@ namespace WiiUAchievements
                 }
                 try
                 {
-                    sample.Snapshot = WindWakerProgression.Parse(Part(packet, 82, WindWakerProgression.ReadSize));
+                    sample.Snapshot = WindWakerProgression.Parse(Part(packet, 82, WindWakerProgression.ReadSize), context);
                     sample.Snapshot.Utc = utc; sample.Snapshot.Context = context;
                 }
                 catch (ArgumentException)

@@ -119,11 +119,19 @@ static class SystemTests
         AchievementPresentation.Apply(expanded, Path.Combine(Path.GetDirectoryName(rulesFile), "achievement-presentation.xml"), AchievementSet.Revision);
         check(AchievementSet.Load(rulesFile).All(a => !a.IsPlanned) && AchievementSet.Load(rulesFile).Count == 16,
             "Legacy runtime XML contains only thresholds understood by the running old application");
-        check(expanded.Count(a => !a.IsPlanned) == 70 && expanded.Count(a => a.IsPlanned) == 40 && expanded.Count(a => a.Experimental) == 53,
-            "Series catalog has 70 executable rules, including 53 explicit experiments, and 40 pending targets");
+        check(expanded.Count(a => !a.IsPlanned) == 110 && !expanded.Any(a => a.IsPlanned) && expanded.Count(a => a.Experimental) == 93,
+            "All 110 catalog targets execute; all 93 source-derived detectors remain explicit experiments");
+        var pendingFixture = new XElement("planned", new XAttribute("id", "fixture-planned"), new XAttribute("title", "Fixture"),
+            new XAttribute("description", "Synthetic future target"), new XAttribute("points", 5),
+            new XAttribute("category", "Storia"), new XAttribute("requirement", "Synthetic missing evidence"));
+        original.Root.Add(pendingFixture);
+        string fixtureFile = Path.Combine(temporary, "planned-fixture.xml");
+        original.Save(fixtureFile);
+        expanded.Add(AchievementSet.Load(fixtureFile).Single(a => a.Id == "fixture-planned"));
         string splitCatalog = Path.Combine(temporary, "split-catalog"); Directory.CreateDirectory(splitCatalog);
         XDocument.Load(rulesFile).Save(Path.Combine(splitCatalog, "active.xml"));
         var companion = XDocument.Load(Path.Combine(Path.GetDirectoryName(rulesFile), "achievements-planned.xml"));
+        companion.Root.Add(new XElement(pendingFixture));
         companion.Root.Elements().First().SetAttributeValue("id", "wallet-10"); companion.Save(Path.Combine(splitCatalog, "pending.xml"));
         var splitGame = new GameDefinition("split", "split", "split", "active.xml", AchievementSet.Revision, "pending.xml", GameCatalog.Default.Profiles[0]);
         check(Rejects(() => splitGame.LoadRules(splitCatalog)), "Duplicate IDs across active and companion files are rejected");
